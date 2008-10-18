@@ -6,6 +6,7 @@ author   'Erik Colson <eco@ecocode.net>';
 
 requires 'DBIx::Class';
 requires 'DBIx::Class::Schema';
+requires 'SQL::Translator';
 build_requires 'Test::More';
 
 auto_install;

@@ -5,7 +5,7 @@ use strict;
 
 =head1 NAME
 
-Finance::QuoteDB - The great new Finance::QuoteDB!
+Finance::QuoteDB - User database tools based on Finance::Quote
 
 =head1 VERSION
 
