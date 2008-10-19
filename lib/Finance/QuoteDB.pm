@@ -3,6 +3,10 @@ package Finance::QuoteDB;
 use warnings;
 use strict;
 
+use Exporter ();
+use vars qw/@EXPORT @EXPORT_OK @EXPORT_TAGS $VERSION/;
+use Finance::Quote;
+
 =head1 NAME
 
 Finance::QuoteDB - User database tools based on Finance::Quote
@@ -13,7 +17,10 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+@EXPORT = ();
+@EXPORT_OK = qw /createdb updatedb addstock/ ;
+@EXPORT_TAGS = ( all => [@EXPORT_OK] );
+$VERSION = '0.01';
 
 
 =head1 SYNOPSIS
@@ -27,25 +34,56 @@ Perhaps a little code snippet.
     my $foo = Finance::QuoteDB->new();
     ...
 
-=head1 EXPORT
+=head1 METHODS
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 FUNCTIONS
-
-=head2 function1
+=head2 createdb
 
 =cut
 
-sub function1 {
+sub createdb {
+  my ($self,$dsn) = @_ ;
+
+  print "COMMAND: Create database $dsn\n";
+  my $schema = Finance::QuoteDB::Schema->connect_and_deploy($dsn); # creates the database
+  return $schema;
 }
 
-=head2 function2
+=head2 updatedb
 
 =cut
 
-sub function2 {
+sub updatedb {
+  my ($self,$dsn) = @_ ;
+
+  print "COMMAND: Update database $dsn\n";
+  if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
+    print "Connected to database $dsn\n";
+  } else {
+    print "ERROR: Could not connect to $dsn\n";
+  }
+}
+
+=head2 addstock
+
+=cut
+
+sub addstock {
+  my ($self,$dsn,$market,$stocks) = @_ ;
+  if ($market) {
+    print "Getting stocks from $market\n" ;
+    if (my @stocks = split(",",$stocks)) {
+      my $q = Finance::Quote->new();
+      my %quotes = $q->fetch($market,@stocks);
+      foreach my $stock (@stocks) {
+        print "Checking stock $stock\n";
+        print " --> $quotes{$stock,'name'}\n" ;
+      }
+    } else {
+      print "No stocks specified\n" ;
+    }
+  } else {
+    print "No market specified\n" ;
+  }
 }
 
 =head1 AUTHOR
@@ -99,7 +137,7 @@ L<http://search.cpan.org/dist/Finance-QuoteDB>
 Copyright 2008 Erik Colson, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+under the GPL terms.
 
 
 =cut

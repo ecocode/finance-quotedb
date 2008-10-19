@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Finance::QuoteDB;
 use Finance::QuoteDB::Schema;
 use Getopt::Long qw(:config);
 use Config::IniFiles;
@@ -11,7 +12,7 @@ fqdb - Manage quote databases
 
 =head1 SYNOPSIS
 
-fqdb [options] command [command_arguments]
+fqdb [options] command
 
 =head1 DESCRIPTION
 
@@ -22,11 +23,14 @@ module.
 
 createdb        Creates a new database
 updatedb        Updates a database
+addstock        Add stocks to database
 
 =head1 OPTIONS
 
   -h --help     Shows help
   --dsn         Which database to use. Defaults to 'dbi:SQLite:fqdb.db'
+  --market      Market from which stocks should be treated
+  --stocks      Stock list (comma separated)
 
 =head1 EXAMPLES
 
@@ -42,35 +46,24 @@ Updates the database quotes.db with new quotes if available.
 =cut
 
 my $dsn = 'dbi:SQLite:fqdb.db';
+my $market = '';
+my $stocks = '';
 
 GetOptions(
   'dsn=s'    => \$dsn,
+  'market=s' => \$market,
+  'stocks=s' => \$stocks,
   'h|help'   => sub { pod2usage(1); }
 ) or pod2usage(2);
 
 my $command = shift(@ARGV)||'';
 
 SWITCH: {
-  ($command eq 'createdb') && do { createdb($dsn);
+  ($command eq 'createdb') && do { Finance::QuoteDB->createdb($dsn);
                                    last SWITCH;};
-  ($command eq 'updatedb') && do { updatedb($dsn);
+  ($command eq 'addstock') && do { Finance::QuoteDB->addstock($dsn,$market,$stocks);
+                                   last SWITCH;};
+  ($command eq 'updatedb') && do { Finance::QuoteDB->updatedb($dsn);
                                    last SWITCH;};
   print "Nothing to do: No command given\n";
 };
-
-sub createdb {
-  my $dsn = shift;
-  print "COMMAND: Create database $dsn\n";
-  my $schema = Finance::QuoteDB::Schema->connect_and_deploy($dsn); # creates the database
-  return $schema;
-}
-
-sub updatedb {
-  my $dsn = shift;
-  print "COMMAND: Update database $dsn\n";
-  if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
-    print "Connected to database $dsn\n";
-  } else {
-    print "ERROR: Could not connect to $dsn\n";
-  }
-}

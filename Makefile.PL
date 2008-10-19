@@ -10,6 +10,7 @@ requires 'DBIx::Class::Schema';
 requires 'SQL::Translator';
 requires 'Pod::Usage';
 requires 'Config::IniFiles';
+requires 'Finance::Quote';
 
 build_requires 'Test::More';
 
