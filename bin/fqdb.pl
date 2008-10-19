@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Finance::QuoteDB::Schema;
 use Getopt::Long qw(:config);
+use Config::IniFiles;
 use Pod::Usage;
 
 =head1 NAME
@@ -48,7 +49,6 @@ GetOptions(
 ) or pod2usage(2);
 
 my $command = shift(@ARGV)||'';
-# my $fqdbSchema = createdb($dsn);
 
 SWITCH: {
   ($command eq 'createdb') && do { createdb($dsn);
@@ -60,12 +60,17 @@ SWITCH: {
 
 sub createdb {
   my $dsn = shift;
-  print "Creating database $dsn\n";
+  print "COMMAND: Create database $dsn\n";
   my $schema = Finance::QuoteDB::Schema->connect_and_deploy($dsn); # creates the database
   return $schema;
 }
 
 sub updatedb {
   my $dsn = shift;
-  print "Update database $dsn\n";
+  print "COMMAND: Update database $dsn\n";
+  if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
+    print "Connected to database $dsn\n";
+  } else {
+    print "ERROR: Could not connect to $dsn\n";
+  }
 }

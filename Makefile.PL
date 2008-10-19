@@ -9,6 +9,7 @@ requires 'DBIx::Class';
 requires 'DBIx::Class::Schema';
 requires 'SQL::Translator';
 requires 'Pod::Usage';
+requires 'Config::IniFiles';
 
 build_requires 'Test::More';
 
