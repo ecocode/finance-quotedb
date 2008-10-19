@@ -8,6 +8,8 @@ license  'gpl';
 requires 'DBIx::Class';
 requires 'DBIx::Class::Schema';
 requires 'SQL::Translator';
+requires 'Pod::Usage';
+
 build_requires 'Test::More';
 
 auto_install;
