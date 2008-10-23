@@ -77,6 +77,14 @@ sub addstock {
       foreach my $stock (@stocks) {
         print "Checking stock $stock\n";
         print " --> $quotes{$stock,'name'}\n" ;
+        if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
+          print "Connected to database $dsn\n";
+          $schema->populate('Symbol',
+                            [[qw /symbolID name fqmarket isin failover/],
+                            [$stock, $quotes{$stock,'name'}, $market, '', 0 ]]);
+        } else {
+          print "ERROR: Could not connect to $dsn\n";
+        }
       }
     } else {
       print "No stocks specified\n" ;
