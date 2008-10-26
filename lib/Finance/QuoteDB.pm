@@ -13,7 +13,7 @@ Finance::QuoteDB - User database tools based on Finance::Quote
 
 =head1 VERSION
 
-Version 0.01
+Version 0.01 pre-alpha
 
 =cut
 
@@ -25,14 +25,8 @@ $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use Finance::QuoteDB;
-
-    my $foo = Finance::QuoteDB->new();
-    ...
+Please take a look at bin/fqdb.pl which is the command-line frontend
+to Finance::QuoteDB.
 
 =head1 METHODS
 
@@ -100,12 +94,11 @@ Erik Colson, C<< <eco at ecocode.net> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-finance-quotedb at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Finance-QuoteDB>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
+Please report any bugs or feature requests to C<bug-finance-quotedb at rt.cpan.org>,
+or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Finance-QuoteDB>.  I
+will be notified, and then you'll automatically be notified of
+progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -144,9 +137,21 @@ L<http://search.cpan.org/dist/Finance-QuoteDB>
 
 Copyright 2008 Erik Colson, all rights reserved.
 
-This program is free software; you can redistribute it and/or modify it
-under the GPL terms.
+This file is part of Finance::QuoteDB.
 
+Finance::QuoteDB is free software: you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+Finance::QuoteDB is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Finance::QuoteDB.  If not, see
+<http://www.gnu.org/licenses/>.
 
 =cut
 
