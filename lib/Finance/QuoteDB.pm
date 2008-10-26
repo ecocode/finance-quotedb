@@ -52,6 +52,14 @@ sub updatedb {
   print "COMMAND: Update database $dsn\n";
   if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
     print "Connected to database $dsn\n";
+    my $stocks_rs = $schema -> resultset('Symbol')->
+      search(undef, { order_by => "fqmarket,symbolID",
+                      columns => [qw / fqmarket symbolID /] });
+    while (my $symbol = $stocks_rs->next ) {
+      my $fqmarket = $symbol->fqmarket() ;
+      my $symbolID = $symbol->symbolID() ;
+      print "SCANNING : $fqmarket - $symbolID\n";
+    }
   } else {
     print "ERROR: Could not connect to $dsn\n";
   }
