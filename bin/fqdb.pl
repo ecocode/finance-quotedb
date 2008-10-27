@@ -64,12 +64,14 @@ GetOptions(
 
 my $command = shift(@ARGV)||'';
 
+my $fqdb = Finance::QuoteDB->new({dsn=>$dsn}) ;
+
 SWITCH: {
-  ($command eq 'createdb') && do { Finance::QuoteDB->createdb($dsn);
+  ($command eq 'createdb') && do { $fqdb->createdb();
                                    last SWITCH;};
-  ($command eq 'addstock') && do { Finance::QuoteDB->addstock($dsn,$market,$stocks);
+  ($command eq 'addstock') && do { $fqdb->addstock($market,$stocks);
                                    last SWITCH;};
-  ($command eq 'updatedb') && do { Finance::QuoteDB->updatedb($dsn);
+  ($command eq 'updatedb') && do { $fqdb->updatedb();
                                    last SWITCH;};
   INFO ("Nothing to do: No command given\n");
 };

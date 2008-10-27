@@ -30,12 +30,42 @@ to Finance::QuoteDB.
 
 =head1 METHODS
 
+=head2 new
+
+new({dsn=>$dsn})
+
+=cut
+
+sub new {
+  my $self = shift;
+  my $class = ref($self) || $self;
+
+  my $this = {};
+  bless $this, $class;
+
+  my $config = shift ;
+
+  foreach (keys %$config) {
+    $this->{$_} = $$config{$_};
+  }
+  if (my $dsn = $this->{dsn}) {
+    INFO ("CREATED FQDB object based on $dsn\n");
+  } else {
+    ERROR ("No dsn specified\n") ;
+    die;
+  }
+
+  return $this;
+}
+
 =head2 createdb
 
 =cut
 
 sub createdb {
-  my ($self,$dsn) = @_ ;
+  my $self = shift;
+
+  my $dsn = $self->{dsn};
 
   INFO ("COMMAND: Create database $dsn\n");
   my $schema = Finance::QuoteDB::Schema->connect_and_deploy($dsn); # creates the database
@@ -47,21 +77,50 @@ sub createdb {
 =cut
 
 sub updatedb {
-  my ($self,$dsn) = @_ ;
-
+  my $self = shift ;
+  
+  my $dsn = $self->{dsn};
+  
   INFO ("COMMAND: Update database $dsn\n");
-  if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
-    INFO ("Connected to database $dsn\n");
-    my $stocks_rs = $schema -> resultset('Symbol')->
-      search(undef, { order_by => "fqmarket,symbolID",
-                      columns => [qw / fqmarket symbolID /] });
-    while (my $symbol = $stocks_rs->next ) {
-      my $fqmarket = $symbol->fqmarket() ;
-      my $symbolID = $symbol->symbolID() ;
-      INFO ("SCANNING : $fqmarket - $symbolID\n");
+  my $schema = $self->connectSchema();
+  my @stocks = $schema -> resultset('Symbol')->
+    search(undef, { order_by => "fqmarket,symbolID",
+                    columns => [qw / fqmarket symbolID /] });
+  my %stocks ;
+  foreach my $stock (@stocks) {
+    my $fqmarket = $stock->fqmarket() ;
+    my $symbolID = $stock->symbolID() ;
+    if (!$stocks{$fqmarket}) {
+      $stocks{$fqmarket} = () ;
+    };
+    push @{$stocks{$fqmarket}}, $symbolID ;
+    INFO ("SCANNING : $fqmarket - $symbolID\n");
+  };
+  foreach my $market (keys %stocks) {
+    DEBUG "$market -->" .join(",",@{$stocks{$market}})."\n" ;
+    $self->updatedbMarketStock($schema,$market,\@{$stocks{$market}}) ;
+  }
+}
+
+=head2 updatedbMarketStock
+
+updatedbMarketStock($market,\@stocks)
+
+=cut
+
+sub updatedbMarketStock {
+  my ($self,$schema,$market,$stockArray) = @_ ;
+  DEBUG "UPDATEDBMARKETSTOCK: $market -->" .join(",",@$stockArray)."\n" ;
+  my $q = Finance::Quote->new();
+  my %quotes = $q->fetch($market,@$stockArray);
+  foreach my $stock (@$stockArray) {
+    INFO ("Checking stock $stock\n");
+    if ($quotes{$stock,"success"}) { # This quote was retrieved
+      INFO (" --> $quotes{$stock,'name'}\n") ;
+      #populate quotes in $schema
+    } else {
+      INFO ("Could not retrieve $stock\n");
     }
-  } else {
-    INFO ("ERROR: Could not connect to $dsn\n");
   }
 }
 
@@ -70,29 +129,54 @@ sub updatedb {
 =cut
 
 sub addstock {
-  my ($self,$dsn,$market,$stocks) = @_ ;
-  if ($market) {
+  my ($self,$market,$stocks) = @_ ;
+
+  my $dsn = $self->{dsn};
+
+  if (!$market) {
+    INFO ("No market specified\n") ;
+    return
+  } else {
     INFO ("Getting stocks from $market\n") ;
-    if (my @stocks = split(",",$stocks)) {
-      my $q = Finance::Quote->new();
-      my %quotes = $q->fetch($market,@stocks);
-      foreach my $stock (@stocks) {
-        INFO ("Checking stock $stock\n");
+  }
+  if (my @stocks = split(",",$stocks)) {
+    my $q = Finance::Quote->new();
+    my %quotes = $q->fetch($market,@stocks);
+    foreach my $stock (@stocks) {
+      INFO ("Checking stock $stock\n");
+      if ($quotes{$stock,"success"}) { # This quote was retrieved
         INFO (" --> $quotes{$stock,'name'}\n") ;
-        if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
-          INFO ("Connected to database $dsn\n");
-          $schema->populate('Symbol',
-                            [[qw /symbolID name fqmarket isin failover/],
-                            [$stock, $quotes{$stock,'name'}, $market, '', 0 ]]);
-        } else {
-          INFO ("ERROR: Could not connect to $dsn\n");
-        }
+        my $schema = $self->connectSchema();
+        $schema->populate('Symbol',
+                          [[qw /symbolID name fqmarket isin failover/],
+                           [$stock, $quotes{$stock,'name'}, $market, '', 0 ]]);
+      } else {
+        INFO ("Could not retrieve $stock\n");
       }
-    } else {
-      INFO ("No stocks specified\n") ;
     }
   } else {
-    INFO ("No market specified\n") ;
+    INFO ("No stocks specified\n") ;
+  }
+}
+
+=head2 connectSchema
+
+connectSchema ()
+
+Returns a reference to a DBIx::Class::Schema
+
+=cut
+
+sub connectSchema{
+  my $self = shift ;
+  my $dsn = $self->{dsn};
+
+  if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
+    INFO ("Connected to database $dsn\n");
+    return $schema ;
+  } else {
+    ERROR ("Could not connect to database $dsn\n") ;
+    die ;
   }
 }
 
