@@ -59,10 +59,13 @@ GetOptions(
   'dsn=s'    => \$dsn,
   'market=s' => \$market,
   'stocks=s' => \$stocks,
-  'h|help'   => sub { pod2usage(1); }
+  'h|help'   => sub { pod2usage(1); },
+  'c|w'      => sub { INFO ("Please read the LICENSE file\n") }
 ) or pod2usage(2);
 
 my $command = shift(@ARGV)||'';
+
+license();
 
 my $fqdb = Finance::QuoteDB->new({dsn=>$dsn}) ;
 
@@ -75,6 +78,18 @@ SWITCH: {
                                    last SWITCH;};
   INFO ("Nothing to do: No command given\n");
 };
+
+=head1 license
+
+=cut
+
+sub license {
+    INFO("Finance::QuoteDB  Copyright (C) 2008  Erik Colson\n") ;
+    INFO("This program comes with ABSOLUTELY NO WARRANTY; for details type `fqdb -w'.\n") ;
+    INFO("This is free software, and you are welcome to redistribute it\n") ;
+    INFO("under certain conditions; type `fqdb -c' for details.\n") ;
+};
+
 
 =head1 COPYRIGHT & LICENSE
 
