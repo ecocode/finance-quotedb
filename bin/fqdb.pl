@@ -5,6 +5,7 @@ use Finance::QuoteDB::Schema;
 use Getopt::Long qw(:config);
 use Config::IniFiles;
 use Pod::Usage;
+use Log::Log4perl qw(:easy);
 
 =head1 NAME
 
@@ -45,6 +46,11 @@ Updates the database quotes.db with new quotes if available.
 
 =cut
 
+# enable debug logging to a file
+Log::Log4perl->easy_init( { level   => $DEBUG,
+#                            file    => ">>fqdb.log"
+                          });
+
 my $dsn = 'dbi:SQLite:fqdb.db';
 my $market = '';
 my $stocks = '';
@@ -65,7 +71,7 @@ SWITCH: {
                                    last SWITCH;};
   ($command eq 'updatedb') && do { Finance::QuoteDB->updatedb($dsn);
                                    last SWITCH;};
-  print "Nothing to do: No command given\n";
+  INFO ("Nothing to do: No command given\n");
 };
 
 =head1 COPYRIGHT & LICENSE

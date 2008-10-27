@@ -6,6 +6,7 @@ use strict;
 use Exporter ();
 use vars qw/@EXPORT @EXPORT_OK @EXPORT_TAGS $VERSION/;
 use Finance::Quote;
+use Log::Log4perl qw(:easy);
 
 =head1 NAME
 
@@ -22,7 +23,6 @@ Version 0.01 pre-alpha
 @EXPORT_TAGS = ( all => [@EXPORT_OK] );
 $VERSION = '0.01';
 
-
 =head1 SYNOPSIS
 
 Please take a look at bin/fqdb.pl which is the command-line frontend
@@ -37,7 +37,7 @@ to Finance::QuoteDB.
 sub createdb {
   my ($self,$dsn) = @_ ;
 
-  print "COMMAND: Create database $dsn\n";
+  INFO ("COMMAND: Create database $dsn\n");
   my $schema = Finance::QuoteDB::Schema->connect_and_deploy($dsn); # creates the database
   return $schema;
 }
@@ -49,19 +49,19 @@ sub createdb {
 sub updatedb {
   my ($self,$dsn) = @_ ;
 
-  print "COMMAND: Update database $dsn\n";
+  INFO ("COMMAND: Update database $dsn\n");
   if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
-    print "Connected to database $dsn\n";
+    INFO ("Connected to database $dsn\n");
     my $stocks_rs = $schema -> resultset('Symbol')->
       search(undef, { order_by => "fqmarket,symbolID",
                       columns => [qw / fqmarket symbolID /] });
     while (my $symbol = $stocks_rs->next ) {
       my $fqmarket = $symbol->fqmarket() ;
       my $symbolID = $symbol->symbolID() ;
-      print "SCANNING : $fqmarket - $symbolID\n";
+      INFO ("SCANNING : $fqmarket - $symbolID\n");
     }
   } else {
-    print "ERROR: Could not connect to $dsn\n";
+    INFO ("ERROR: Could not connect to $dsn\n");
   }
 }
 
@@ -72,27 +72,27 @@ sub updatedb {
 sub addstock {
   my ($self,$dsn,$market,$stocks) = @_ ;
   if ($market) {
-    print "Getting stocks from $market\n" ;
+    INFO ("Getting stocks from $market\n") ;
     if (my @stocks = split(",",$stocks)) {
       my $q = Finance::Quote->new();
       my %quotes = $q->fetch($market,@stocks);
       foreach my $stock (@stocks) {
-        print "Checking stock $stock\n";
-        print " --> $quotes{$stock,'name'}\n" ;
+        INFO ("Checking stock $stock\n");
+        INFO (" --> $quotes{$stock,'name'}\n") ;
         if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
-          print "Connected to database $dsn\n";
+          INFO ("Connected to database $dsn\n");
           $schema->populate('Symbol',
                             [[qw /symbolID name fqmarket isin failover/],
                             [$stock, $quotes{$stock,'name'}, $market, '', 0 ]]);
         } else {
-          print "ERROR: Could not connect to $dsn\n";
+          INFO ("ERROR: Could not connect to $dsn\n");
         }
       }
     } else {
-      print "No stocks specified\n" ;
+      INFO ("No stocks specified\n") ;
     }
   } else {
-    print "No market specified\n" ;
+    INFO ("No market specified\n") ;
   }
 }
 
