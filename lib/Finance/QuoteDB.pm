@@ -78,11 +78,11 @@ sub createdb {
 
 sub updatedb {
   my $self = shift ;
-  
+
   my $dsn = $self->{dsn};
-  
+
   INFO ("COMMAND: Update database $dsn\n");
-  my $schema = $self->connectSchema();
+  my $schema = $self->schema();
   my @stocks = $schema -> resultset('Symbol')->
     search(undef, { order_by => "fqmarket,symbolID",
                     columns => [qw / fqmarket symbolID /] });
@@ -146,7 +146,7 @@ sub addstock {
       INFO ("Checking stock $stock\n");
       if ($quotes{$stock,"success"}) { # This quote was retrieved
         INFO (" --> $quotes{$stock,'name'}\n") ;
-        my $schema = $self->connectSchema();
+        my $schema = $self->schema();
         $schema->populate('Symbol',
                           [[qw /symbolID name fqmarket isin failover/],
                            [$stock, $quotes{$stock,'name'}, $market, '', 0 ]]);
@@ -159,25 +159,27 @@ sub addstock {
   }
 }
 
-=head2 connectSchema
+=head2 schema
 
-connectSchema ()
+schema ()
 
-Returns a reference to a DBIx::Class::Schema
+If necessary, creates a DBIx::Class::Schema and returns a reference to that DBIx::Class::Schema.
 
 =cut
 
-sub connectSchema{
+sub schema {
   my $self = shift ;
   my $dsn = $self->{dsn};
-
-  if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
-    INFO ("Connected to database $dsn\n");
-    return $schema ;
-  } else {
-    ERROR ("Could not connect to database $dsn\n") ;
-    die ;
+  if (!$self->{schema}) {
+    if (my $schema = Finance::QuoteDB::Schema->connect($dsn)) {
+      INFO ("Connected to database $dsn\n");
+      $self->{schema} = $schema ;
+    } else {
+      ERROR ("Could not connect to database $dsn\n") ;
+      die ;
+    }
   }
+  return $self->{schema}
 }
 
 =head1 AUTHOR
