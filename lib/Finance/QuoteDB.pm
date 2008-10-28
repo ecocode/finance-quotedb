@@ -60,6 +60,8 @@ sub new {
 
 =head2 createdb
 
+createdb()
+
 =cut
 
 sub createdb {
@@ -73,6 +75,8 @@ sub createdb {
 }
 
 =head2 updatedb
+
+updatedb()
 
 =cut
 
@@ -137,6 +141,8 @@ sub updatedbMarketStock {
 
 =head2 addstock
 
+addstock($market,$stocks)
+
 =cut
 
 sub addstock {
@@ -172,7 +178,7 @@ sub addstock {
 
 =head2 schema
 
-schema ()
+schema()
 
 If necessary, creates a DBIx::Class::Schema and returns a reference to that DBIx::Class::Schema.
 
