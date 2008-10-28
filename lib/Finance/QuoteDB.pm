@@ -98,7 +98,7 @@ sub updatedb {
   };
   foreach my $market (keys %stocks) {
     DEBUG "$market -->" .join(",",@{$stocks{$market}})."\n" ;
-    $self->updatedbMarketStock($schema,$market,\@{$stocks{$market}}) ;
+    $self->updatedbMarketStock($market,\@{$stocks{$market}}) ;
   }
 }
 
@@ -109,15 +109,26 @@ updatedbMarketStock($market,\@stocks)
 =cut
 
 sub updatedbMarketStock {
-  my ($self,$schema,$market,$stockArray) = @_ ;
+  my ($self,$market,$stockArray) = @_ ;
+  my $schema = $self->schema();
   DEBUG "UPDATEDBMARKETSTOCK: $market -->" .join(",",@$stockArray)."\n" ;
   my $q = Finance::Quote->new();
   my %quotes = $q->fetch($market,@$stockArray);
   foreach my $stock (@$stockArray) {
-    INFO ("Checking stock $stock\n");
     if ($quotes{$stock,"success"}) { # This quote was retrieved
-      INFO (" --> $quotes{$stock,'name'}\n") ;
-      #populate quotes in $schema
+      INFO ("Updating stock $stock --> $quotes{$stock,'last'}\n");
+      my $quoters = $schema->resultset('Quote')->update_or_create(
+        { symbolID => $stock,
+          date => $quotes{$stock,'date'},
+          previous_close => $quotes{$stock,'close'},
+          day_open => $quotes{$stock,'open'},
+          day_high => $quotes{$stock,'high'},
+          day_low => $quotes{$stock,'low'},
+          day_close => $quotes{$stock,'last'},
+          bid => $quotes{$stock,'bid'},
+          ask => $quotes{$stock,'ask'},
+          volume => $quotes{$stock,'volume'}
+        });
     } else {
       INFO ("Could not retrieve $stock\n");
     }
