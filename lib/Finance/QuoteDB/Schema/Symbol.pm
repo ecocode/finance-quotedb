@@ -32,6 +32,12 @@ __PACKAGE__->add_columns ( symbolID=> { data_type=>'varchar',
                                   },
                            failover=> { data_type=>'boolean',
                                         default_value=>'FALSE'
+                                      },
+                           currency=> { data_type=>'varchar',
+                                        size=>4,
+                                        is_nullable=>1,
+                                        is_auto_increment=>0,
+                                        default_value=>''
                                       }
                          );
 

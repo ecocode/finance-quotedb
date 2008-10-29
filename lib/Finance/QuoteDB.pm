@@ -165,8 +165,8 @@ sub addstock {
         INFO (" --> $quotes{$stock,'name'}\n") ;
         my $schema = $self->schema();
         $schema->populate('Symbol',
-                          [[qw /symbolID name fqmarket isin failover/],
-                           [$stock, $quotes{$stock,'name'}, $market, '', 0 ]]);
+                          [[qw /symbolID name fqmarket isin failover currency/],
+                           [$stock, $quotes{$stock,'name'}, $market, '', 0, $quotes{$stock,'currency'} ]]);
       } else {
         INFO ("Could not retrieve $stock\n");
       }
