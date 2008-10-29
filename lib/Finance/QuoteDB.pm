@@ -137,7 +137,29 @@ sub updatedbMarketStock {
       INFO ("Could not retrieve $stock\n");
     }
   }
-}
+};
+
+=head2 delstock
+
+delstock($stocks)
+
+=cut
+
+sub delstock {
+  my ($self,$stocks) = @_ ;
+
+  if (my @stocks = split(",",$stocks)) {
+    my $schema = $self->schema();
+    foreach my $stock (@stocks) {
+      INFO ("Deleting stock $stock\n");
+      my $rs = $schema -> resultset('Symbol')->
+        search({'symbolID' => $stock});
+      $rs->delete_all();
+    }
+  } else {
+    INFO ("No stocks specified\n") ;
+  }
+};
 
 =head2 addstock
 
@@ -174,7 +196,7 @@ sub addstock {
   } else {
     INFO ("No stocks specified\n") ;
   }
-}
+};
 
 =head2 schema
 

@@ -30,6 +30,7 @@ module.
 
 createdb        Creates a new database
 addstock        Add stocks to database
+delstock        Remove stocks from a database
 updatedb        Updates a database
 
 =head1 OPTIONS
@@ -79,6 +80,8 @@ SWITCH: {
   ($command eq 'createdb') && do { $fqdb->createdb();
                                    last SWITCH;};
   ($command eq 'addstock') && do { $fqdb->addstock($market,$stocks);
+                                   last SWITCH;};
+  ($command eq 'delstock') && do { $fqdb->delstock($stocks);
                                    last SWITCH;};
   ($command eq 'updatedb') && do { $fqdb->updatedb();
                                    last SWITCH;};
