@@ -25,7 +25,7 @@ $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-Please take a look at bin/fqdb.pl which is the command-line frontend
+Please take a look at script/fqdb which is the command-line frontend
 to Finance::QuoteDB.
 
 =head1 METHODS

@@ -13,7 +13,10 @@ requires 'Config::IniFiles';
 requires 'Finance::Quote';
 requires 'Log::Log4perl';
 
-build_requires 'Test::More';
+test_requires 'Test::More';
+
+install_script 'fqdb';
+no_index directory => 'examples';
 
 auto_install;
 
