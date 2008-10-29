@@ -4,6 +4,10 @@ use base qw/DBIx::Class::Schema/;
 use strict;
 use warnings;
 
+use vars qw /$VERSION/;
+
+$VERSION = '0.00_50';
+
 __PACKAGE__->load_classes(qw/ Symbol Quote /);
 
 =head1 METHODS
