@@ -6,6 +6,16 @@ use warnings;
 
 __PACKAGE__->load_classes(qw/ Symbol Quote /);
 
+=head1 METHODS
+
+=head2 connect_and_deploy
+
+connect_and_deploy($dsn)
+
+Connects to $dsn and (re)generates the database structure
+
+=cut
+
 sub connect_and_deploy {
   my ($class,$dsn) = @_;
   my $self=$class->connect($dsn);
