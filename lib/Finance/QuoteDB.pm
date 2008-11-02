@@ -125,7 +125,7 @@ sub updatedbMarketStock {
       INFO ("Updating stock $stock --> $quotes{$stock,'last'}\n");
       my $quoters = $schema->resultset('Quote')->update_or_create(
         { symbolID => $stock,
-          date => $quotes{$stock,'date'},
+          date => $quotes{$stock,'isodate'},
           previous_close => $quotes{$stock,'close'},
           day_open => $quotes{$stock,'open'},
           day_high => $quotes{$stock,'high'},
