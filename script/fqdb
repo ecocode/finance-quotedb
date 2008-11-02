@@ -38,6 +38,8 @@ backpopulate    Retrieves history quotes and put them in the database
 
   -h --help     Shows help
   --dsn         Which database to use. Defaults to 'dbi:SQLite:fqdb.db'
+  --dsnuser     Username if needed for dsn
+  --dsnpassword Password if needed for dsn
   --market      Market from which stocks should be treated
   --stocks      Stock list (comma separated)
   --start_date  start_date for usage with backpopulate
@@ -63,6 +65,8 @@ Log::Log4perl->easy_init( { level   => $DEBUG,
                           });
 
 my $dsn = 'dbi:SQLite:fqdb.db';
+my $dsnuser = '';
+my $dsnpasswd = '';
 my $market = '';
 my $stocks = '';
 my $overwrite = 1 ; # overwrite existing data by default
@@ -70,21 +74,23 @@ my $start_date = '1900-01-01' ;
 my $end_date = '' ;
 
 GetOptions(
-  'dsn=s'    => \$dsn,
-  'market=s' => \$market,
-  'stocks=s' => \$stocks,
-  'start_date=s' => \$start_date,
-  'end_date=s' => \$end_date,
-  'overwrite!' => \$overwrite,
-  'h|help'   => sub { pod2usage(1); },
-  'c|w'      => sub { INFO ("Please read the LICENSE file\n") }
+  'dsn=s'                    => \$dsn,
+  'dsnuser=s'                => \$dsnuser,
+  'dsnpassword|dsnpasswd=s'  => \$dsnpasswd,
+  'market=s'                 => \$market,
+  'stocks=s'                 => \$stocks,
+  'start_date=s'             => \$start_date,
+  'end_date=s'               => \$end_date,
+  'overwrite!'               => \$overwrite,
+  'h|help'                   => sub { pod2usage(1); },
+  'c|w'                      => sub { INFO ("Please read the LICENSE file\n") }
 ) or pod2usage(2);
 
 my $command = shift(@ARGV)||'';
 
 license();
 
-my $fqdb = Finance::QuoteDB->new({dsn=>$dsn}) ;
+my $fqdb = Finance::QuoteDB->new({dsn=>$dsn,dsnuser=>$dsnuser,dsnpasswd=>$dsnpasswd}) ;
 
 SWITCH: {
   ($command eq 'createdb') && do { $fqdb->createdb();

@@ -21,8 +21,8 @@ Connects to $dsn and (re)generates the database structure
 =cut
 
 sub connect_and_deploy {
-  my ($class,$dsn) = @_;
-  my $self=$class->connect($dsn);
+  my ($class,$dsn,$user,$password) = @_;
+  my $self=$class->connect($dsn,$user,$password);
   $self->deploy({ add_drop_tables => 1});
   return $self;
 } ;
