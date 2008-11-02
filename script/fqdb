@@ -32,6 +32,7 @@ createdb        Creates a new database
 addstock        Add stocks to database
 delstock        Remove stocks from a database
 updatedb        Updates a database
+backpopulate    Retrieves history quotes and put them in the database
 
 =head1 OPTIONS
 
@@ -39,6 +40,9 @@ updatedb        Updates a database
   --dsn         Which database to use. Defaults to 'dbi:SQLite:fqdb.db'
   --market      Market from which stocks should be treated
   --stocks      Stock list (comma separated)
+  --start_date  start_date for usage with backpopulate
+  --end-date    end_date for usage with backpopulate
+  --overwrite   indicates if updates should overwrite previously saved data. Defaults to yes. Only works for backpopulate for now...
 
 =head1 EXAMPLES
 
@@ -61,11 +65,17 @@ Log::Log4perl->easy_init( { level   => $DEBUG,
 my $dsn = 'dbi:SQLite:fqdb.db';
 my $market = '';
 my $stocks = '';
+my $overwrite = 1 ; # overwrite existing data by default
+my $start_date = '1900-01-01' ;
+my $end_date = '' ;
 
 GetOptions(
   'dsn=s'    => \$dsn,
   'market=s' => \$market,
   'stocks=s' => \$stocks,
+  'start_date=s' => \$start_date,
+  'end_date=s' => \$end_date,
+  'overwrite!' => \$overwrite,
   'h|help'   => sub { pod2usage(1); },
   'c|w'      => sub { INFO ("Please read the LICENSE file\n") }
 ) or pod2usage(2);
@@ -85,6 +95,8 @@ SWITCH: {
                                    last SWITCH;};
   ($command eq 'updatedb') && do { $fqdb->updatedb();
                                    last SWITCH;};
+  ($command eq 'backpopulate') && do { $fqdb->backpopulate($start_date,$end_date,$overwrite,$stocks);
+                                       last SWITCH;};
   INFO ("Nothing to do: No command given\n");
 };
 

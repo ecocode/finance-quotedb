@@ -11,6 +11,7 @@ requires 'SQL::Translator';
 requires 'Pod::Usage';
 requires 'Config::IniFiles';
 requires 'Finance::Quote';
+requires 'Finance::QuoteHist';
 requires 'Log::Log4perl';
 
 test_requires 'Test::More';
