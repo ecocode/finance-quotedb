@@ -141,7 +141,7 @@ sub updatedbMarketStock {
   }
 };
 
-=head2 backPopulate
+=head2 backpopulate
 
 backpopulate($start_date, $end_date, $overwrite, $stocks)
 
@@ -270,7 +270,7 @@ sub schema {
   return $self->{schema}
 }
 
-=head2
+=head2 today
 
 today()
 
