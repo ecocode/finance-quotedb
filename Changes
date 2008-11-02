@@ -1,5 +1,9 @@
 Revision history for Finance-QuoteDB
 
+0.01       2.11.2008
+           stabelized version
+           function backpopulate created
+
 0.00_51    29.10.2008
            function delstock created
 

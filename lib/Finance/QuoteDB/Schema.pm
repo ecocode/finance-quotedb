@@ -6,7 +6,7 @@ use warnings;
 
 use vars qw /$VERSION/;
 
-$VERSION = '0.00_51';
+$VERSION = '0.01';
 
 __PACKAGE__->load_classes(qw/ Symbol Quote /);
 
