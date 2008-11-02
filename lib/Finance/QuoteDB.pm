@@ -156,10 +156,21 @@ sub backpopulate {
     my $q = Finance::QuoteHist->new( symbols => \@stocks,
                                      start_date => $start_date,
                                      end_date => $end_date );
+    my $line ;
+    my %symbols ;
     foreach my $row ($q->quotes()) {
       my ($symbol, $date, $open, $high, $low, $close, $volume) = @$row;
       $date =~ tr|/|-|;
-      INFO ("$symbol - $date : $close / $volume\n");
+      my $tline = substr($date,0,7) ;
+      if ($line ne $tline) {
+        INFO ("$tline") ;
+        %symbols = () ;
+      };
+      $line = $tline ;
+      if (!$symbols{$symbol}) {
+        $symbols{$symbol}=1;
+        INFO (" -> $symbol") ;
+      }
       my %data = ( symbolID => $symbol,
                    date => $date,
                    day_open => $open,
