@@ -16,14 +16,14 @@ Finance::QuoteDB - User database tools based on Finance::Quote
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
 @EXPORT = ();
 @EXPORT_OK = qw /createdb updatedb addstock/ ;
 @EXPORT_TAGS = ( all => [@EXPORT_OK] );
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 =head1 SYNOPSIS
 

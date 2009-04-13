@@ -6,7 +6,7 @@ use warnings;
 
 use vars qw /$VERSION/;
 
-$VERSION = '0.01';
+$VERSION = '0.03';
 
 __PACKAGE__->load_components(qw/ PK::Auto Core /);
 __PACKAGE__->table('quote');
