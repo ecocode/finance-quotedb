@@ -42,7 +42,7 @@ sub new {
   my $self = shift;
   my $class = ref($self) || $self;
 
-  my $this = {};
+  my $this = {} ;
   bless $this, $class;
 
   my $config = shift ;
@@ -92,41 +92,45 @@ sub updatedb {
 
   my $schema = $self->schema();
   my @stocks = $schema -> resultset('Symbol')->
-    search(undef, { order_by => "fqmarket,symbolID",
-                    columns => [qw / fqmarket symbolID /] });
-  my %stocks ;
+    search(undef, { order_by => "fqmarket,fqsymbol",
+                    columns => [qw / symbolID fqmarket fqsymbol /] });
+  my %symbolIDs ;
+  my %fqsymbols ;
   foreach my $stock (@stocks) {
-    my $fqmarket = $stock->fqmarket() ;
+    my $fqmarket = $stock->fqmarket()->name() ;
     my $symbolID = $stock->symbolID() ;
-    if (!$stocks{$fqmarket}) {
-      $stocks{$fqmarket} = () ;
-    };
-    push @{$stocks{$fqmarket}}, $symbolID ;
-    INFO ("SCANNING : $fqmarket - $symbolID\n");
+    my $fqsymbol = $stock->fqsymbol() ;
+#    if (!$symbolIDs{$fqmarket}) {
+#      $symbolIDs{$fqmarket} = {} ;
+#    };
+    ${$symbolIDs{$fqmarket}}{ $fqsymbol } = $symbolID ;
+    INFO ("SCANNING : $fqmarket - $fqsymbol -> $symbolID\n");
   };
-  foreach my $market (keys %stocks) {
-    DEBUG "$market -->" .join(",",@{$stocks{$market}})."\n" ;
-    $self->updatedbMarketStock($market,\@{$stocks{$market}}) ;
+  foreach my $market (keys %symbolIDs) {
+    DEBUG "$market -->" .join( "," , keys(%{$symbolIDs{$market}}) ) ."\n" ;
+    $self->updatedbMarketStock ( $market , \%{$symbolIDs{$market}} ) ;
   }
 }
 
 =head2 updatedbMarketStock
 
-updatedbMarketStock($market,\@stocks)
+updatedbMarketStock($market,\%symbolIDs)
 
 =cut
 
 sub updatedbMarketStock {
-  my ($self,$market,$stockArray) = @_ ;
+  my ($self,$market,$stockHash) = @_ ;
   my $schema = $self->schema();
-  DEBUG "UPDATEDBMARKETSTOCK: $market -->" .join(",",@$stockArray)."\n" ;
+  my @fqsymbols = keys(%{$stockHash}) ;
+  DEBUG "UPDATEDBMARKETSTOCK: $market -->" .join(",",@fqsymbols)."\n" ;
   my $q = Finance::Quote->new();
-  my %quotes = $q->fetch($market,@$stockArray);
-  foreach my $stock (@$stockArray) {
+  my %quotes = $q->fetch($market,@fqsymbols);
+  foreach my $stock (@fqsymbols) {
     if ($quotes{$stock,"success"}) { # This quote was retrieved
-      INFO ("Updating stock $stock --> $quotes{$stock,'last'}\n");
+      my $symbolID = ${$stockHash}{$stock} ;
+      INFO ("Updating stock $stock ($symbolID) --> $quotes{$stock,'last'}\n");
       my $quoters = $schema->resultset('Quote')->update_or_create(
-        { symbolID => $stock,
+        { symbolID => $symbolID,
           date => $quotes{$stock,'isodate'},
           previous_close => $quotes{$stock,'close'},
           day_open => $quotes{$stock,'open'},
@@ -152,16 +156,23 @@ backpopulate($start_date, $end_date, $overwrite, $stocks)
 sub backpopulate {
   my ($self, $start_date, $end_date, $overwrite, $stocks) = @_;
   $end_date = $self->today() if (!$end_date);
-  if (my @stocks = split(",",$stocks)) {
+  if (my @symbolIDs = split(",",$stocks)) {
     INFO ("Retrieving data...\n");
     my $schema = $self->schema();
-    my $q = Finance::QuoteHist->new( symbols => \@stocks,
+    my %symbolID ;
+    foreach my $symbolID (@symbolIDs) {
+      my $fqsymbol = $schema -> resultset('Symbol')->single({symbolID => $symbolID})->fqsymbol() ;
+      $symbolID{$fqsymbol} = $symbolID ;
+    }
+    my @fqsymbols = keys (%symbolID);
+
+    my $q = Finance::QuoteHist->new( symbols => \@fqsymbols,
                                      start_date => $start_date,
                                      end_date => $end_date );
     my $line ;
     my %symbols ;
     foreach my $row ($q->quotes()) {
-      my ($symbol, $date, $open, $high, $low, $close, $volume) = @$row;
+      my ($fqsymbol, $date, $open, $high, $low, $close, $volume) = @$row;
       $date =~ tr|/|-|;
       my $tline = substr($date,0,7) ;
       if ($line ne $tline) {
@@ -169,11 +180,11 @@ sub backpopulate {
         %symbols = () ;
       };
       $line = $tline ;
-      if (!$symbols{$symbol}) {
-        $symbols{$symbol}=1;
-        INFO (" -> $symbol") ;
+      if (!$symbols{$fqsymbol}) {
+        $symbols{$fqsymbol}=1;
+        INFO (" -> $fqsymbol") ;
       }
-      my %data = ( symbolID => $symbol,
+      my %data = ( symbolID => $symbolID{$fqsymbol},
                    date => $date,
                    day_open => $open,
                    day_high => $high,
@@ -182,9 +193,9 @@ sub backpopulate {
                    volume => $volume
                  ) ;
       if ($overwrite) {
-        my $quoters = $schema->resultset('Quote')->update_or_create( \%data ) ;
+        $schema->resultset('Quote')->update_or_create( \%data ) ;
       } else {
-        my $quoters = $schema->resultset('Quote')->find_or_create( \%data ) ;
+        $schema->resultset('Quote')->find_or_create( \%data ) ;
       }
     }
   }
@@ -216,6 +227,9 @@ sub delstock {
 
 addstock($market,$stocks)
 
+$stocks is in the format FQsymbol[USERsymbol],...
+If USERsymbol is ommitted then USERsymbol will be set to FQsymbol
+
 =cut
 
 sub addstock {
@@ -228,16 +242,27 @@ sub addstock {
     INFO ("Getting stocks from $market\n") ;
   }
   if (my @stocks = split(",",$stocks)) {
+    my %symbolIDs ;
+    foreach my $stockItem (@stocks) {
+      if ( $stockItem =~ m/([^\[]+)(\[(.+)\])?/ ) {
+        my ($fqsymbol,$symbolID) = ($1,$3) ;
+        $symbolID = $fqsymbol if (!$symbolID) ;
+        INFO (" Stock $fqsymbol <- $symbolID") ;
+        $symbolIDs{$fqsymbol}=$symbolID ;
+      }
+    }
+    my @fqsymbols = keys %symbolIDs ;
     my $q = Finance::Quote->new();
-    my %quotes = $q->fetch($market,@stocks);
-    foreach my $stock (@stocks) {
+    my %quotes = $q->fetch($market,@fqsymbols);
+    foreach my $stock (@fqsymbols) {
       INFO ("Checking stock $stock\n");
       if ($quotes{$stock,"success"}) { # This quote was retrieved
         INFO (" --> $quotes{$stock,'name'}\n") ;
         my $schema = $self->schema();
+        my $marketID = $schema->resultset('FQMarket')->find_or_create({name=>$market})->marketID();
         $schema->populate('Symbol',
-                          [[qw /symbolID name fqmarket isin failover currency/],
-                           [$stock, $quotes{$stock,'name'}, $market, '', 0, $quotes{$stock,'currency'} ]]);
+                          [[qw /symbolID name fqmarket fqsymbol isin currency/],
+                           [$symbolIDs{$stock}, $quotes{$stock,'name'}, $marketID, $stock, '', $quotes{$stock,'currency'} ]]);
       } else {
         INFO ("Could not retrieve $stock\n");
       }

@@ -42,7 +42,8 @@ module.
   --dsnuser     Username if needed for dsn
   --dsnpassword Password if needed for dsn
   --market      Market from which stocks should be treated
-  --stocks      Stock list (comma separated)
+  --stocks      Stock list (comma separated) use [] to specify your own ID
+                i.e. GOOG[GOOGLE]
   --start_date  start_date for usage with backpopulate
   --end-date    end_date for usage with backpopulate
   --overwrite   indicates if updates should overwrite previously saved data.

@@ -8,7 +8,7 @@ use vars qw /$VERSION/;
 
 $VERSION = '0.01';
 
-__PACKAGE__->load_classes(qw/ Symbol Quote /);
+__PACKAGE__->load_classes(qw/ Symbol Quote FQMarket /);
 
 =head1 METHODS
 
