@@ -11,32 +11,37 @@ $VERSION = '0.01';
 __PACKAGE__->load_components(qw/ PK::Auto Core /);
 __PACKAGE__->table('symbol');
 __PACKAGE__->add_columns ( symbolID=> { data_type=>'varchar',
-                                        size=>10,
+                                        size=>20,
                                         is_nullable=>0,
                                         is_auto_increment=>0,
                                         default_value=>''
                                       },
+                           fqmarket=> { data_type=>'integer',
+                                        is_nullable=>1,
+                                        is_auto_increment=>0,
+                                        default_value=>0
+                                      },
+                           fqsymbol=> { data_type=>'varchar',
+                                        size=>20,
+                                        is_nullable=>0,
+                                        is_auto_increment=>0,
+                                        default_value=>''
+                                      },
+                           fqfailover=> { data_type=>'boolean',  # will failover be applied to this datasource ?
+                                          default_value=>'FALSE'
+                                        },
                            name=> { data_type=>'varchar',
                                     size=>40,
                                     is_nullable=>1,
                                     is_auto_increment=>0,
                                     default_value=>''
                                   },
-                           fqmarket=> { data_type=>'varchar',
-                                        size=>20,
-                                        is_nullable=>1,
-                                        is_auto_increment=>0,
-                                        default_value=>''
-                                      },
                            isin=> { data_type=>'varchar',
                                     size=>12,
                                     is_nullable=>1,
                                     is_auto_increment=>0,
                                     default_value=>''
                                   },
-                           failover=> { data_type=>'boolean',
-                                        default_value=>'FALSE'
-                                      },
                            currency=> { data_type=>'varchar',
                                         size=>4,
                                         is_nullable=>1,
@@ -47,6 +52,7 @@ __PACKAGE__->add_columns ( symbolID=> { data_type=>'varchar',
 
 __PACKAGE__->set_primary_key('symbolID');
 __PACKAGE__->has_many('quotes'=>'Finance::QuoteDB::Schema::Quote','symbolID');
+__PACKAGE__->belongs_to('fqmarket'=>'Finance::QuoteDB::Schema::FQMarket');
 
 =head1 COPYRIGHT & LICENSE
 
