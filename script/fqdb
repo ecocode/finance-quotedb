@@ -11,7 +11,7 @@ use Log::Log4perl qw(:easy);
 
 use vars qw /$VERSION/;
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 =head1 NAME
 
@@ -28,23 +28,25 @@ module.
 
 =head1 COMMANDS
 
-createdb        Creates a new database
-addstock        Add stocks to database
-delstock        Remove stocks from a database
-updatedb        Updates a database
-backpopulate    Retrieves history quotes and put them in the database
+  createdb      Creates a new database
+  addstock      Add stocks to database
+  delstock      Remove stocks from a database
+  updatedb      Updates a database
+  backpopulate  Retrieves history quotes and put them in the database
 
 =head1 OPTIONS
 
   -h --help     Shows help
-  --dsn         Which database to use. Defaults to 'dbi:SQLite:fqdb.db'. format = 'dbi:$dbType:dbname=$dbname;host=$host;port=$port'
+  --dsn         Which database to use. Defaults to 'dbi:SQLite:fqdb.db'.
+                format = 'dbi:$dbType:dbname=$dbname;host=$host;port=$port'
   --dsnuser     Username if needed for dsn
   --dsnpassword Password if needed for dsn
   --market      Market from which stocks should be treated
   --stocks      Stock list (comma separated)
   --start_date  start_date for usage with backpopulate
   --end-date    end_date for usage with backpopulate
-  --overwrite   indicates if updates should overwrite previously saved data. Defaults to yes. Only works for backpopulate for now...
+  --overwrite   indicates if updates should overwrite previously saved data.
+                Defaults to yes. Only works for backpopulate for now...
 
 =head1 EXAMPLES
 

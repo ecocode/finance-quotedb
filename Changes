@@ -1,5 +1,8 @@
 Revision history for Finance-QuoteDB
 
+0.02       13.4.2009
+           support for dsn user and password added
+
 0.01       2.11.2008
            stabelized version
            function backpopulate created
