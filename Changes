@@ -1,5 +1,13 @@
 Revision history for Finance-QuoteDB
 
+0.04       16.4.2009
+           Code cleanup.
+           Stabilized release.
+
+0.03       13.4.2009
+           Schema modified to hold user symbols and market info.
+           Not backwards compatible !
+
 0.02       13.4.2009
            support for dsn user and password added
 
