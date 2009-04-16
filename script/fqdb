@@ -40,8 +40,8 @@ module.
   --market      Market from which stocks should be treated
   --stocks      Stock list (comma separated) use [] to specify your own ID
                 i.e. GOOG[GOOGLE]
-  --start_date  start_date for usage with backpopulate
-  --end-date    end_date for usage with backpopulate
+  --startdate   startdate for usage with backpopulate defaults to '1900-01-01'
+  --enddate     enddate for usage with backpopulate defaults to '' (today)
   --overwrite   indicates if updates should overwrite previously saved data.
                 Defaults to yes. Only works for backpopulate for now...
   -v --version  Returns version number of Finance::QuoteDB
@@ -72,8 +72,8 @@ my $dsnpasswd = '';
 my $market = '';
 my $stocks = '';
 my $overwrite = 1 ; # overwrite existing data by default
-my $start_date = '1900-01-01' ;
-my $end_date = '' ;
+my $startdate = '1900-01-01' ;
+my $enddate = '' ;
 
 license();
 
@@ -83,8 +83,8 @@ GetOptions(
   'dsnpassword|dsnpasswd=s'  => \$dsnpasswd,
   'market=s'                 => \$market,
   'stocks=s'                 => \$stocks,
-  'start_date=s'             => \$start_date,
-  'end_date=s'               => \$end_date,
+  'startdate=s'             => \$startdate,
+  'enddate=s'               => \$enddate,
   'overwrite!'               => \$overwrite,
   'h|help'                   => sub { pod2usage(1); },
   'c|w'                      => sub { INFO ("Please read the LICENSE file\n") },
@@ -106,7 +106,7 @@ if ($command) {
                                      last SWITCH;};
     ($command eq 'updatedb') && do { $fqdb->updatedb();
                                      last SWITCH;};
-    ($command eq 'backpopulate') && do { $fqdb->backpopulate($start_date,$end_date,$overwrite,$stocks);
+    ($command eq 'backpopulate') && do { $fqdb->backpopulate($startdate,$enddate,$overwrite,$stocks);
                                          last SWITCH;};
     INFO ("Nothing to do: No command given\n");
   };

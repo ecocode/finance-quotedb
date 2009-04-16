@@ -1,5 +1,8 @@
 Revision history for Finance-QuoteDB
 
+0.05       
+           Option names modified (--startdate and --enddate) in fqdb
+
 0.04       16.4.2009
            Code cleanup.
            Stabilized release.
