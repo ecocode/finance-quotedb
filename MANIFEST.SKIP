@@ -2,4 +2,4 @@ inc
 .*\.tar\.gz
 \.git
 .*\.bak
-Makefile
+^Makefile$
