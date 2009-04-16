@@ -4,10 +4,6 @@ use base qw/DBIx::Class/;
 use strict;
 use warnings;
 
-use vars qw /$VERSION/;
-
-$VERSION = '0.03';
-
 __PACKAGE__->load_components(qw/ PK::Auto Core /);
 __PACKAGE__->table('quote');
 __PACKAGE__->add_columns ( symbolID=> { data_type=>'varchar',

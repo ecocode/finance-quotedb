@@ -9,10 +9,6 @@ use Config::IniFiles;
 use Pod::Usage;
 use Log::Log4perl qw(:easy);
 
-use vars qw /$VERSION/;
-
-$VERSION = '0.03';
-
 =head1 NAME
 
 fqdb - Manage quote databases
@@ -48,6 +44,7 @@ module.
   --end-date    end_date for usage with backpopulate
   --overwrite   indicates if updates should overwrite previously saved data.
                 Defaults to yes. Only works for backpopulate for now...
+  -v --version  Returns version number of Finance::QuoteDB
 
 =head1 EXAMPLES
 
@@ -88,7 +85,8 @@ GetOptions(
   'end_date=s'               => \$end_date,
   'overwrite!'               => \$overwrite,
   'h|help'                   => sub { pod2usage(1); },
-  'c|w'                      => sub { INFO ("Please read the LICENSE file\n") }
+  'c|w'                      => sub { INFO ("Please read the LICENSE file\n") },
+  'v|version'                => sub { INFO ("Finance::QuoteDB version is $Finance::QuoteDB::VERSION\n")}
 ) or pod2usage(2);
 
 my $command = shift(@ARGV)||'';

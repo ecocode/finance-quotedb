@@ -4,10 +4,6 @@ use base qw/DBIx::Class/;
 use strict;
 use warnings;
 
-use vars qw /$VERSION/;
-
-$VERSION = '0.03';
-
 __PACKAGE__->load_components(qw/ PK::Auto Core /);
 __PACKAGE__->table('FQMarket');
 __PACKAGE__->add_columns ( marketID=> { data_type=>'integer',
