@@ -14,16 +14,12 @@ use Log::Log4perl qw(:easy);
 
 Finance::QuoteDB - User database tools based on Finance::Quote
 
-=head1 VERSION
-
-Version 0.03
-
 =cut
 
 @EXPORT = ();
 @EXPORT_OK = qw /createdb updatedb addstock/ ;
 @EXPORT_TAGS = ( all => [@EXPORT_OK] );
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -100,9 +96,6 @@ sub updatedb {
     my $fqmarket = $stock->fqmarket()->name() ;
     my $symbolID = $stock->symbolID() ;
     my $fqsymbol = $stock->fqsymbol() ;
-#    if (!$symbolIDs{$fqmarket}) {
-#      $symbolIDs{$fqmarket} = {} ;
-#    };
     ${$symbolIDs{$fqmarket}}{ $fqsymbol } = $symbolID ;
     INFO ("SCANNING : $fqmarket - $fqsymbol -> $symbolID\n");
   };

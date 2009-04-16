@@ -75,6 +75,8 @@ my $overwrite = 1 ; # overwrite existing data by default
 my $start_date = '1900-01-01' ;
 my $end_date = '' ;
 
+license();
+
 GetOptions(
   'dsn=s'                    => \$dsn,
   'dsnuser=s'                => \$dsnuser,
@@ -86,28 +88,29 @@ GetOptions(
   'overwrite!'               => \$overwrite,
   'h|help'                   => sub { pod2usage(1); },
   'c|w'                      => sub { INFO ("Please read the LICENSE file\n") },
-  'v|version'                => sub { INFO ("Finance::QuoteDB version is $Finance::QuoteDB::VERSION\n")}
+  'v|version'                => sub { INFO ("Finance::QuoteDB version is ".Finance::QuoteDB->VERSION."\n") ;
+                                      INFO ("Finance::Quote version is ".Finance::Quote->VERSION."\n") }
 ) or pod2usage(2);
 
 my $command = shift(@ARGV)||'';
 
-license();
+if ($command) {
+  my $fqdb = Finance::QuoteDB->new({dsn=>$dsn,dsnuser=>$dsnuser,dsnpasswd=>$dsnpasswd}) ;
 
-my $fqdb = Finance::QuoteDB->new({dsn=>$dsn,dsnuser=>$dsnuser,dsnpasswd=>$dsnpasswd}) ;
-
-SWITCH: {
-  ($command eq 'createdb') && do { $fqdb->createdb();
-                                   last SWITCH;};
-  ($command eq 'addstock') && do { $fqdb->addstock($market,$stocks);
-                                   last SWITCH;};
-  ($command eq 'delstock') && do { $fqdb->delstock($stocks);
-                                   last SWITCH;};
-  ($command eq 'updatedb') && do { $fqdb->updatedb();
-                                   last SWITCH;};
-  ($command eq 'backpopulate') && do { $fqdb->backpopulate($start_date,$end_date,$overwrite,$stocks);
-                                       last SWITCH;};
-  INFO ("Nothing to do: No command given\n");
-};
+ SWITCH: {
+    ($command eq 'createdb') && do { $fqdb->createdb();
+                                     last SWITCH;};
+    ($command eq 'addstock') && do { $fqdb->addstock($market,$stocks);
+                                     last SWITCH;};
+    ($command eq 'delstock') && do { $fqdb->delstock($stocks);
+                                     last SWITCH;};
+    ($command eq 'updatedb') && do { $fqdb->updatedb();
+                                     last SWITCH;};
+    ($command eq 'backpopulate') && do { $fqdb->backpopulate($start_date,$end_date,$overwrite,$stocks);
+                                         last SWITCH;};
+    INFO ("Nothing to do: No command given\n");
+  };
+}
 
 =head1 license
 
