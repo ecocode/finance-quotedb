@@ -1,5 +1,8 @@
 Revision history for Finance-QuoteDB
 
+0.06       26.4.2009
+           Added function getquotes
+
 0.05       17.4.2009
            Option names modified (--startdate and --enddate) in fqdb
 
