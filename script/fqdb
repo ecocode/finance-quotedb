@@ -29,6 +29,7 @@ module.
   delstock      Remove stocks from a database
   updatedb      Updates a database
   backpopulate  Retrieves history quotes and put them in the database
+  getquote      Retrieves and outputs quotes from the database
 
 =head1 OPTIONS
 
@@ -40,8 +41,8 @@ module.
   --market      Market from which stocks should be treated
   --stocks      Stock list (comma separated) use [] to specify your own ID
                 i.e. GOOG[GOOGLE]
-  --startdate   startdate for usage with backpopulate defaults to '1900-01-01'
-  --enddate     enddate for usage with backpopulate defaults to '' (today)
+  --startdate   startdate for usage with backpopulate and getquote defaults to '1900-01-01'
+  --enddate     enddate for usage with backpopulate and getquote defaults to '' (today)
   --overwrite   indicates if updates should overwrite previously saved data.
                 Defaults to yes. Only works for backpopulate for now...
   -v --version  Returns version number of Finance::QuoteDB
@@ -108,6 +109,8 @@ if ($command) {
                                      last SWITCH;};
     ($command eq 'backpopulate') && do { $fqdb->backpopulate($startdate,$enddate,$overwrite,$stocks);
                                          last SWITCH;};
+    ($command eq 'getquotes') && do { $fqdb->getquotes($stocks,$startdate,$enddate);
+                                      last SWITCH;};
     INFO ("Nothing to do: No command given\n");
   };
 }

@@ -265,6 +265,38 @@ sub addstock {
   }
 };
 
+=head2 getquote
+
+getquotes($USERsymbols, $date_start [,$date_end] )
+
+This function returns quotes between $date_start and $date_end for the specified
+user symbols (comma separated list).  Range will be one day if $date_end is
+omitted.
+
+=cut
+
+sub getquotes {
+  my ($self,$USERsymbols,$date_start,$date_end) = @_ ;
+  $date_end = $date_start if !($date_end) ;
+  my $schema = $self->schema();
+
+  if (my @stocks = split(",",$USERsymbols)) {
+    foreach my $USERsymbol (@stocks) {
+      my $rs = $schema->resultset('Quote')
+        ->search( { symbolID=>$USERsymbol,
+                    date=>{'BETWEEN',[$date_start, $date_end]} },
+                  { columns=> [qw/ date day_open day_high day_low day_close volume /],
+                    order_by=> [qw/ date /] });
+      print "STOCK : $USERsymbol\n";
+      print "DATE           OPEN     HIGH      LOW    CLOSE       VOLUME\n" ;
+      while (my $q = $rs->next()) {
+        printf "%10s %8.2f %8.2f %8.2f %8.2f %12d\n",
+          $q->date(), $q->day_open(), $q->day_high(), $q->day_low(), $q->day_close(), $q->volume() ;
+      }
+    }
+  }
+}
+
 =head2 schema
 
 schema()
@@ -309,11 +341,11 @@ Erik Colson, C<< <eco at ecocode.net> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-finance-quotedb at rt.cpan.org>,
-or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Finance-QuoteDB>.  I
-will be notified, and then you'll automatically be notified of
-progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-finance-quotedb at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Finance-QuoteDB>.  I will be
+notified, and you'll automatically be notified of progress on your bug as I make
+changes.
 
 =head1 SUPPORT
 
