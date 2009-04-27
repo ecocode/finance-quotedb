@@ -1,5 +1,8 @@
 Revision history for Finance-QuoteDB
 
+0.08       27.4.2009
+           Added inc dir in releases
+
 0.07       27.4.2009
            Bug in POD corrected
 
