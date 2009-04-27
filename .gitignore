@@ -12,4 +12,5 @@ META.yml
 *.db
 inc
 *.log
+*.bak
 MANIFEST

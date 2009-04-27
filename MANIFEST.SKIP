@@ -2,4 +2,7 @@ inc
 .*\.tar\.gz
 \.git
 .*\.bak
+blib
+.*.bak$
+~.*
 ^Makefile$
