@@ -19,7 +19,7 @@ Finance::QuoteDB - User database tools based on Finance::Quote
 @EXPORT = ();
 @EXPORT_OK = qw /createdb updatedb addstock/ ;
 @EXPORT_TAGS = ( all => [@EXPORT_OK] );
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -265,7 +265,7 @@ sub addstock {
   }
 };
 
-=head2 getquote
+=head2 getquotes
 
 getquotes($USERsymbols, $date_start [,$date_end] )
 
