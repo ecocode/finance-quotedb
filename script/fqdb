@@ -31,6 +31,7 @@ module.
   backpopulate  Retrieves history quotes and put them in the database
   dumpquotes    Retrieves and outputs quotes from the database
   dumpstocks    Retrieves and outputs stock symbols and info from the database
+  GTWriteConfig Writes a config file for usage with Geniustrader
 
 =head1 OPTIONS
 
@@ -46,6 +47,7 @@ module.
   --enddate     enddate for usage with backpopulate and getquote defaults to '' (today)
   --overwrite   indicates if updates should overwrite previously saved data.
                 Defaults to yes. Only works for backpopulate for now...
+  --configFile  Name of file to create as configuration file.
   -v --version  Returns version number of Finance::QuoteDB
 
 =head1 EXAMPLES
@@ -76,6 +78,7 @@ my $stocks = '';
 my $overwrite = 1 ; # overwrite existing data by default
 my $startdate = '1900-01-01' ;
 my $enddate = '' ;
+my $configFile = '' ;
 
 license();
 
@@ -85,9 +88,10 @@ GetOptions(
   'dsnpassword|dsnpasswd=s'  => \$dsnpasswd,
   'market=s'                 => \$market,
   'stocks=s'                 => \$stocks,
-  'startdate=s'             => \$startdate,
-  'enddate=s'               => \$enddate,
+  'startdate=s'              => \$startdate,
+  'enddate=s'                => \$enddate,
   'overwrite!'               => \$overwrite,
+  'configFile=s'             => \$configFile,
   'h|help'                   => sub { pod2usage(1); },
   'c|w'                      => sub { INFO ("Please read the LICENSE file\n") },
   'v|version'                => sub { INFO ("Finance::QuoteDB version is ".Finance::QuoteDB->VERSION."\n") ;
@@ -114,6 +118,8 @@ if ($command) {
                                        last SWITCH;};
     ($command eq 'dumpstocks') && do { $fqdb->dumpstocks();
                                        last SWITCH;};
+    ($command eq 'GTWriteConfig') && do { $fqdb->Finance::QuoteDB::Geniustrader::writeConfig($configFile);
+                                          last SWITCH;};
     INFO ("Nothing to do: No command given\n");
   };
 }

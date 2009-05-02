@@ -8,6 +8,8 @@ use vars qw/@EXPORT @EXPORT_OK @EXPORT_TAGS $VERSION/;
 use Finance::Quote;
 use Finance::QuoteHist;
 
+require Finance::QuoteDB::Geniustrader;
+
 use Log::Log4perl qw(:easy);
 
 =head1 NAME
@@ -337,7 +339,7 @@ sub dumpstocks {
   my @stocks = $schema -> resultset('Symbol')->
     search(undef, { order_by => "symbolID,fqmarket,fqsymbol",
                     columns => [qw / symbolID fqmarket fqsymbol /] });
-  print "USERSYMBOL     FQMARKET       FQSYMBOL\n";
+  print "     USERSYMBOL       FQMARKET         FQSYMBOL\n";
   foreach my $stock (@stocks) {
     my $fqmarket = $stock->fqmarket()->name() ;
     my $symbolID = $stock->symbolID() ;
