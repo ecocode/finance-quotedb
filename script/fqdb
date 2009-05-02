@@ -29,7 +29,7 @@ module.
   delstock      Remove stocks from a database
   updatedb      Updates a database
   backpopulate  Retrieves history quotes and put them in the database
-  getquote      Retrieves and outputs quotes from the database
+  dumpquotes    Retrieves and outputs quotes from the database
 
 =head1 OPTIONS
 
@@ -109,8 +109,8 @@ if ($command) {
                                      last SWITCH;};
     ($command eq 'backpopulate') && do { $fqdb->backpopulate($startdate,$enddate,$overwrite,$stocks);
                                          last SWITCH;};
-    ($command eq 'getquotes') && do { $fqdb->getquotes($stocks,$startdate,$enddate);
-                                      last SWITCH;};
+    ($command eq 'dumpquotes') && do { $fqdb->dumpquotes($stocks,$startdate,$enddate);
+                                       last SWITCH;};
     INFO ("Nothing to do: No command given\n");
   };
 }
