@@ -319,6 +319,33 @@ sub dumpquotes {
   }
 }
 
+=head2 dumpstocks
+
+dumpstocks ()
+
+This function dumps the symbols of the stocks in the database.
+
+=cut
+
+sub dumpstocks {
+  my $self = shift ;
+
+  my $dsn = $self->{dsn};
+  INFO ("COMMAND: Dump stocks in database $dsn\n");
+
+  my $schema = $self->schema();
+  my @stocks = $schema -> resultset('Symbol')->
+    search(undef, { order_by => "symbolID,fqmarket,fqsymbol",
+                    columns => [qw / symbolID fqmarket fqsymbol /] });
+  print "USERSYMBOL     FQMARKET       FQSYMBOL\n";
+  foreach my $stock (@stocks) {
+    my $fqmarket = $stock->fqmarket()->name() ;
+    my $symbolID = $stock->symbolID() ;
+    my $fqsymbol = $stock->fqsymbol() ;
+    printf "%15s %15s %15s\n",$symbolID,$fqmarket,$fqsymbol;
+  };
+}
+
 =head2 schema
 
 schema()

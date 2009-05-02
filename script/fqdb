@@ -30,6 +30,7 @@ module.
   updatedb      Updates a database
   backpopulate  Retrieves history quotes and put them in the database
   dumpquotes    Retrieves and outputs quotes from the database
+  dumpstocks    Retrieves and outputs stock symbols and info from the database
 
 =head1 OPTIONS
 
@@ -110,6 +111,8 @@ if ($command) {
     ($command eq 'backpopulate') && do { $fqdb->backpopulate($startdate,$enddate,$overwrite,$stocks);
                                          last SWITCH;};
     ($command eq 'dumpquotes') && do { $fqdb->dumpquotes($stocks,$startdate,$enddate);
+                                       last SWITCH;};
+    ($command eq 'dumpstocks') && do { $fqdb->dumpstocks();
                                        last SWITCH;};
     INFO ("Nothing to do: No command given\n");
   };
