@@ -39,7 +39,6 @@ sub writeConfig {
   my $dsn = $fqdb->{dsn};
   INFO ("--- $dsn") ;
   if ( open($fh,"+>","$file") ) {
-    print $fh "DB::module genericdbi\n" ;
     my $db = "";
     my $dbname = "";
     my $dbhost = "" ;
@@ -55,6 +54,7 @@ sub writeConfig {
       $dbport = $1 ;
     }
 		print $fh "# Database specific stuff\n";
+    print $fh "DB::module genericdbi\n" ;
     print $fh "DB::genericdbi::db $db\n" if $db ;
     print $fh "DB::genericdbi::dbname $dbname\n" if $dbname ;
     print $fh "DB::genericdbi::dbhost $dbhost\n" if $dbhost ;
