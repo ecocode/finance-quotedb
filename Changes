@@ -1,5 +1,10 @@
 Revision history for Finance-QuoteDB
 
+0.13       3.5.2009
+           Some required default values set
+           BUGFIX: Geniustrader config file corrected
+           \n added to generated config file
+
 0.12       3.5.2009
            Log enabled only when FQDBDEBUG is set. Replaced some INFO with print.
            WriteConfig sql_name added
