@@ -65,10 +65,14 @@ Updates the database quotes.db with new quotes if available.
 
 =cut
 
-# enable debug logging to a file
-Log::Log4perl->easy_init( { level   => $DEBUG,
+# enable Log::Log4perl to only output $ERRORS
+Log::Log4perl->easy_init( { level   => $ERROR,
 #                            file    => ">>fqdb.log"
                           });
+my $logger = Log::Log4perl::get_logger();
+if ($ENV{"FQDBDEBUG"}) { # enable debug logging if FQDBDEBUG is set
+	$logger->level($DEBUG)
+}
 
 my $dsn = 'dbi:SQLite:fqdb.db';
 my $dsnuser = '';
@@ -93,9 +97,9 @@ GetOptions(
   'overwrite!'               => \$overwrite,
   'configFile=s'             => \$configFile,
   'h|help'                   => sub { pod2usage(1); },
-  'c|w'                      => sub { INFO ("Please read the LICENSE file\n") },
-  'v|version'                => sub { INFO ("Finance::QuoteDB version is ".Finance::QuoteDB->VERSION."\n") ;
-                                      INFO ("Finance::Quote version is ".Finance::Quote->VERSION."\n") }
+  'c|w'                      => sub { print ("Please read the LICENSE file\n") },
+  'v|version'                => sub { print ("Finance::QuoteDB version is ".Finance::QuoteDB->VERSION."\n") ;
+                                      print ("Finance::Quote version is ".Finance::Quote->VERSION."\n") }
 ) or pod2usage(2);
 
 my $command = shift(@ARGV)||'';
@@ -129,10 +133,10 @@ if ($command) {
 =cut
 
 sub license {
-    INFO("Finance::QuoteDB  Copyright (C) 2008  Erik Colson\n") ;
-    INFO("This program comes with ABSOLUTELY NO WARRANTY; for details type `fqdb -w'.\n") ;
-    INFO("This is free software, and you are welcome to redistribute it\n") ;
-    INFO("under certain conditions; type `fqdb -c' for details.\n") ;
+    print("Finance::QuoteDB  Copyright (C) 2008  Erik Colson\n") ;
+    print("This program comes with ABSOLUTELY NO WARRANTY; for details type `fqdb -w'.\n") ;
+    print("This is free software, and you are welcome to redistribute it\n") ;
+    print("under certain conditions; type `fqdb -c' for details.\n") ;
 };
 
 

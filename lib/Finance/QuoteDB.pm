@@ -99,7 +99,7 @@ sub updatedb {
     my $symbolID = $stock->symbolID() ;
     my $fqsymbol = $stock->fqsymbol() ;
     ${$symbolIDs{$fqmarket}}{ $fqsymbol } = $symbolID ;
-    INFO ("SCANNING : $fqmarket - $fqsymbol -> $symbolID\n");
+    print ("SCANNING : $fqmarket - $fqsymbol -> $symbolID\n");
   };
   foreach my $market (keys %symbolIDs) {
     DEBUG "$market -->" .join( "," , keys(%{$symbolIDs{$market}}) ) ."\n" ;
@@ -123,7 +123,7 @@ sub updatedbMarketStock {
   foreach my $stock (@fqsymbols) {
     if ($quotes{$stock,"success"}) { # This quote was retrieved
       my $symbolID = ${$stockHash}{$stock} ;
-      INFO ("Updating stock $stock ($symbolID) --> $quotes{$stock,'last'}\n");
+      print ("Updating stock $stock ($symbolID) --> $quotes{$stock,'last'}\n");
       my $quoters = $schema->resultset('Quote')->update_or_create(
         { symbolID => $symbolID,
           date => $quotes{$stock,'isodate'},
@@ -137,7 +137,7 @@ sub updatedbMarketStock {
           volume => $quotes{$stock,'volume'}
         });
     } else {
-      INFO ("Could not retrieve $stock\n");
+      print ("Could not retrieve $stock\n");
     }
   }
 };
@@ -152,7 +152,7 @@ sub backpopulate {
   my ($self, $start_date, $end_date, $overwrite, $stocks) = @_;
   $end_date = $self->today() if (!$end_date);
   if (my @symbolIDs = split(",",$stocks)) {
-    INFO ("Retrieving data...\n");
+    print ("Retrieving data...\n");
     my $schema = $self->schema();
     my %symbolID ;
     foreach my $symbolID (@symbolIDs) {
@@ -208,13 +208,13 @@ sub delstock {
   if (my @stocks = split(",",$stocks)) {
     my $schema = $self->schema();
     foreach my $stock (@stocks) {
-      INFO ("Deleting stock $stock\n");
+      print ("Deleting stock $stock\n");
       my $rs = $schema -> resultset('Symbol')->
         search({'symbolID' => $stock});
       $rs->delete_all();
     }
   } else {
-    INFO ("No stocks specified\n") ;
+    print ("No stocks specified\n") ;
   }
 };
 
@@ -231,10 +231,10 @@ sub addstock {
   my ($self,$market,$stocks) = @_ ;
 
   if (!$market) {
-    INFO ("No market specified\n") ;
+    print ("No market specified\n") ;
     return
   } else {
-    INFO ("Getting stocks from $market\n") ;
+    print ("Getting stocks from $market\n") ;
   }
   if (my @stocks = split(",",$stocks)) {
     my %symbolIDs ;
@@ -250,20 +250,20 @@ sub addstock {
     my $q = Finance::Quote->new();
     my %quotes = $q->fetch($market,@fqsymbols);
     foreach my $stock (@fqsymbols) {
-      INFO ("Checking stock $stock\n");
+      print ("Checking stock $stock\n");
       if ($quotes{$stock,"success"}) { # This quote was retrieved
-        INFO (" --> $quotes{$stock,'name'}\n") ;
+        print (" --> $quotes{$stock,'name'}\n") ;
         my $schema = $self->schema();
         my $marketID = $schema->resultset('FQMarket')->find_or_create({name=>$market})->marketID();
         $schema->populate('Symbol',
                           [[qw /symbolID name fqmarket fqsymbol isin currency/],
                            [$symbolIDs{$stock}, $quotes{$stock,'name'}, $marketID, $stock, '', $quotes{$stock,'currency'} ]]);
       } else {
-        INFO ("Could not retrieve $stock\n");
+        print ("Could not retrieve $stock\n");
       }
     }
   } else {
-    INFO ("No stocks specified\n") ;
+    print ("No stocks specified\n") ;
   }
 };
 
