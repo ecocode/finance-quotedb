@@ -62,7 +62,7 @@ sub writeConfig {
     print $fh "DB:genericdbi:dbpasswd=".$fqdb->{dsnpasswd}."\n" if $fqdb->{dsnpasswd} ;
     print $fh "DB::genericdbi::prices_sql=SELECT day_open, day_high, day_low, day_close, volume, date ".
 			"FROM quote WHERE symbolID = '\$code' ORDER BY date DESC\n" ;
-		print $fh "DB::genericdbi::name_sql=SELECT name FROM symbol WHERE symbolID = '\$code'" ;
+		print $fh "DB::genericdbi::name_sql=SELECT name FROM symbol WHERE symbolID = '\$code'\n" ;
     close $fh ;
   } else {
     ERROR ("Could not open $file in write mode") ;
