@@ -10,7 +10,7 @@ use Log::Log4perl qw(:easy);
 
 =head1 NAME
 
-Finance::QuoteDB::Interface::Geniustrader - Interfaces to external program Geniustrader
+Finance::QuoteDB::Geniustrader - Interfaces to external program Geniustrader
 
 =cut
 
@@ -66,3 +66,5 @@ sub writeConfig {
     ERROR ("Could not open $file in write mode") ;
   }
 }
+
+1;

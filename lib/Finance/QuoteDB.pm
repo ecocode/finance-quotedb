@@ -21,7 +21,7 @@ Finance::QuoteDB - User database tools based on Finance::Quote
 @EXPORT = ();
 @EXPORT_OK = qw /createdb updatedb addstock/ ;
 @EXPORT_TAGS = ( all => [@EXPORT_OK] );
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 =head1 SYNOPSIS
 
