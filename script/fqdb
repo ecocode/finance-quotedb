@@ -43,8 +43,8 @@ module.
   --market      Market from which stocks should be treated
   --stocks      Stock list (comma separated) use [] to specify your own ID
                 i.e. GOOG[GOOGLE]
-  --startdate   startdate for usage with backpopulate and getquote defaults to '1900-01-01'
-  --enddate     enddate for usage with backpopulate and getquote defaults to '' (today)
+  --startdate   startdate for usage with backpopulate and dumpquotes defaults to '1900-01-01'
+  --enddate     enddate for usage with backpopulate and dumpquotes defaults to '' (today)
   --overwrite   indicates if updates should overwrite previously saved data.
                 Defaults to yes. Only works for backpopulate for now...
   --configFile  Name of file to create as configuration file.
