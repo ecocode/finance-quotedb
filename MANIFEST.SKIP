@@ -6,3 +6,4 @@ blib
 ~.*
 .*\.db
 ^Makefile$
+^MANIFEST.SKIP$

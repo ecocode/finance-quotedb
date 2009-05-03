@@ -1,5 +1,9 @@
 Revision history for Finance-QuoteDB
 
+0.12       3.5.2009
+           Log enabled only when FQDBDEBUG is set. Replaced some INFO with print.
+           WriteConfig sql_name added
+
 0.11       3.5.2009
            BUGFIX: package named badly
            Geniustrader.pm returns 1
@@ -43,5 +47,3 @@ Revision history for Finance-QuoteDB
 
 0.00_50    29.10.2008
            First version
-
-
