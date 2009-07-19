@@ -66,13 +66,13 @@ Updates the database quotes.db with new quotes if available.
 =cut
 
 # enable Log::Log4perl to only output $ERRORS
-Log::Log4perl->easy_init( { level   => $ERROR,
+Log::Log4perl->easy_init( { level   => $INFO,
 #                            file    => ">>fqdb.log"
                           });
 my $logger = Log::Log4perl::get_logger();
 if ($ENV{"FQDBDEBUG"}) { # enable debug logging if FQDBDEBUG is set
 	$logger->level($DEBUG)
-}
+};
 
 my $dsn = 'dbi:SQLite:fqdb.db';
 my $dsnuser = '';

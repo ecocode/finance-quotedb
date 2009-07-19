@@ -48,6 +48,12 @@ sub new {
   foreach (keys %$config) {
     $this->{$_} = $$config{$_};
   }
+  $this->{logger} = Log::Log4perl::get_logger();
+  if ($ENV{"FQDBDEBUG"}) { # enable debug logging if FQDBDEBUG is set
+    $this->{logger}->level($DEBUG)
+  } else {
+    $this->{logger}->level($INFO)
+  } ;
   if (my $dsn = $this->{dsn}) {
     INFO ("CREATED FQDB object based on $dsn\n");
   } else {
