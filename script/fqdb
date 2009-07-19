@@ -32,6 +32,7 @@ module.
   dumpquotes    Retrieves and outputs quotes from the database
   dumpstocks    Retrieves and outputs stock symbols and info from the database
   GTWriteConfig Writes a config file for usage with Geniustrader
+  addYahooStocks Retrieves and adds all yahoo known symbols for specified exchanges
 
 =head1 OPTIONS
 
@@ -40,7 +41,8 @@ module.
                 format = 'dbi:$dbType:dbname=$dbname;host=$host;port=$port'
   --dsnuser     Username if needed for dsn
   --dsnpassword Password if needed for dsn
-  --market      Market from which stocks should be treated
+  --market      Market from which stocks should be treated. See Finance::Quote submodules
+  --exchanges   Exchanges as named by Yahoo. Comma separated list.
   --stocks      Stock list (comma separated) use [] to specify your own ID
                 i.e. GOOG[GOOGLE]
   --startdate   startdate for usage with backpopulate and dumpquotes defaults to '1900-01-01'
@@ -78,6 +80,7 @@ my $dsn = 'dbi:SQLite:fqdb.db';
 my $dsnuser = '';
 my $dsnpasswd = '';
 my $market = '';
+my $exchanges = '';
 my $stocks = '';
 my $overwrite = 1 ; # overwrite existing data by default
 my $startdate = '1900-01-01' ;
@@ -91,6 +94,7 @@ GetOptions(
   'dsnuser=s'                => \$dsnuser,
   'dsnpassword|dsnpasswd=s'  => \$dsnpasswd,
   'market=s'                 => \$market,
+  'exchanges=s'              => \$exchanges,
   'stocks=s'                 => \$stocks,
   'startdate=s'              => \$startdate,
   'enddate=s'                => \$enddate,
@@ -124,6 +128,8 @@ if ($command) {
                                        last SWITCH;};
     ($command eq 'GTWriteConfig') && do { $fqdb->Finance::QuoteDB::Geniustrader::writeConfig($configFile);
                                           last SWITCH;};
+    ($command eq 'addYahooStocks') && do { $fqdb->add_yahoo_stocks($exchanges);
+                                           last SWITCH;};
     INFO ("Nothing to do: No command given\n");
   };
 }

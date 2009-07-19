@@ -7,6 +7,8 @@ use Exporter ();
 use vars qw/@EXPORT @EXPORT_OK @EXPORT_TAGS $VERSION/;
 use Finance::Quote;
 use Finance::QuoteHist;
+use LWP::UserAgent;
+use HTML::TableExtract;
 
 require Finance::QuoteDB::Geniustrader;
 
@@ -352,6 +354,83 @@ sub dumpstocks {
     my $fqsymbol = $stock->fqsymbol() ;
     printf "%15s %15s %15s\n",$symbolID,$fqmarket,$fqsymbol;
   };
+}
+
+=head2 add_yahoo_stocks
+
+add_yahoo_stocks( @markets )
+
+retrieves yahoo tickers for specified exchanges and stores them in your database
+NOTE: @markets is currently unsupported !
+
+=cut
+
+sub add_yahoo_stocks {
+  my ($self,$exchanges) = @_ ;
+  my $sStart = 'AA';
+  my $sEnd = 'ZZ';
+  my $popquantity = 30 ; # number of stocks to add in 1 call of addstock
+
+  if (!defined($exchanges)) {
+    ERROR ("No exchanges specified");
+  } else {
+    my $ua = LWP::UserAgent->new;
+    $ua->env_proxy;
+    my @exchanges=split(',',$exchanges);
+    INFO("Adding symbols from ".join(",",@exchanges).".") ;
+    my $yahoo_url = "http://finance.yahoo.com/search?v=s&r=50" ;
+
+    no strict 'subs' ;
+
+    my %symbols ;
+
+    foreach my $s ($sStart..$sEnd) {
+      INFO ("Scanning through $s");
+      my $b = 1 ; # counter in url
+      my $cont ;
+      do {
+        $cont = 1; # continue increasing b
+        my $url = $yahoo_url."&s=".$s."&b=".$b ;
+        DEBUG("URL: $url");
+        my $req = HTTP::Request->new(GET => $url);
+        my $reply = $ua->request($req);
+        if ($reply->is_success) {
+          if ($reply->content=~ m|COMPANIES.*&nbsp;(\d)+ - (\d+) out of\s+(\d+)|) { # check if this is last page for $s
+            my ($from,$to,$total)=($1,$2,$3);
+            $b=$to+1; # next page should start at this symbol
+            $cont = ($to < $total);
+          }
+          # scrape the symbols from this page
+          my $te = HTML::TableExtract->new( headers=>[qw /Ticker/ ] );
+          $te->parse($reply->content);
+          foreach my $ts ($te->tables) {
+            foreach my $tr ($ts->rows) {
+              INFO (" Symbol: @$tr[0]");
+              $symbols{@$tr[0]}+=1 ;                           # add the symbol as a key in the hash removes duplicates automatically
+            }
+          }
+        }
+      } while ($cont);
+      if ($s ne $sEnd) {
+        my $sleeptime = int(60+rand(60)) ;
+        INFO("Sleeping $sleeptime");
+        sleep $sleeptime;                                      # needed otherwise we might overload yahoo server
+      }
+    }
+    delete $symbols{Private} ;                                 # 'Private' is not a ticker symbol
+    my @symbols = sort keys %symbols ;
+    while ($#symbols>0) {                                      # still elements in the array
+      my $sleeptime = int(20+rand(20)) ;
+      INFO("Sleeping $sleeptime");
+      sleep $sleeptime;                                        # needed otherwise we might overload yahoo server
+      my $stocks = join (",",splice(@symbols,0,$popquantity)); # take $popquantity number of elements out
+      # my $stocks = join (",",@symbols[0..$popquantity-1]);
+      # @symbols = @symbols[$popquantity+1..$#symbols-1];
+      INFO (" Adding stocks: $stocks");
+      $self->addstock('yahoo',$stocks);                        # add stocks in database
+    }
+  }
+  INFO("Finished adding stocks from yahoo");
 }
 
 =head2 schema
