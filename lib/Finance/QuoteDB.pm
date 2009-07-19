@@ -358,69 +358,68 @@ sub dumpstocks {
 
 =head2 add_yahoo_stocks
 
-add_yahoo_stocks( @markets )
+add_yahoo_stocks( $exchange )
 
 retrieves yahoo tickers for specified exchanges and stores them in your database
-NOTE: @markets is currently unsupported !
+NOTE: $exchange being the extension as coming from yahoo !
 
 =cut
 
 sub add_yahoo_stocks {
-  my ($self,$exchanges) = @_ ;
-  my $sStart = 'AA';
-  my $sEnd = 'ZZ';
+  # http://uk.biz.yahoo.com/p/uk/cpi/index.html -> list of european stocks
+  # http://finance.yahoo.com/lookup?s=**.BR&t=S&b=0
+  my ($self,$exchange) = @_ ;
   my $popquantity = 30 ; # number of stocks to add in 1 call of addstock
 
-  if (!defined($exchanges)) {
-    ERROR ("No exchanges specified");
+  if (!defined($exchange)) {
+    ERROR ("No exchange specified");
   } else {
     my $ua = LWP::UserAgent->new;
     $ua->env_proxy;
-    my @exchanges=split(',',$exchanges);
-    INFO("Adding symbols from ".join(",",@exchanges).".") ;
-    my $yahoo_url = "http://finance.yahoo.com/search?v=s&r=50" ;
+    INFO("Adding symbols from $exchange.") ;
+    my $yahoo_url = "http://finance.yahoo.com/lookup?s=**.$exchange&t=S" ; # t=S means ONLY stocks
 
     no strict 'subs' ;
 
     my %symbols ;
 
-    foreach my $s ($sStart..$sEnd) {
-      INFO ("Scanning through $s");
-      my $b = 1 ; # counter in url
-      my $cont ;
-      do {
-        $cont = 1; # continue increasing b
-        my $url = $yahoo_url."&s=".$s."&b=".$b ;
-        DEBUG("URL: $url");
-        my $req = HTTP::Request->new(GET => $url);
-        my $reply = $ua->request($req);
-        if ($reply->is_success) {
-          if ($reply->content=~ m|COMPANIES.*&nbsp;(\d)+ - (\d+) out of\s+(\d+)|) { # check if this is last page for $s
-            my ($from,$to,$total)=($1,$2,$3);
-            $b=$to+1; # next page should start at this symbol
-            $cont = ($to < $total);
-          }
-          # scrape the symbols from this page
-          my $te = HTML::TableExtract->new( headers=>[qw /Ticker/ ] );
-          $te->parse($reply->content);
-          foreach my $ts ($te->tables) {
-            foreach my $tr ($ts->rows) {
-              INFO (" Symbol: @$tr[0]");
-              $symbols{@$tr[0]}+=1 ;                           # add the symbol as a key in the hash removes duplicates automatically
+    my $b = 0 ; # counter in url
+    my $cont ;
+    do {
+      $cont = 1; # continue increasing b
+      my $url = $yahoo_url."&b=".$b ;
+      DEBUG("URL: $url");
+      my $req = HTTP::Request->new(GET => $url);
+      my $reply = $ua->request($req);
+      if ($reply->is_success) {
+        if ($reply->content=~ m|Showing\s+(\d)+ - (\d+) of\s+(\d+)|) { # check if this is last page for this market
+          my ($from,$to,$total)=($1,$2,$3);
+          INFO (int($to*100/$total)." % completed");
+          $b=$to; # next page should start at this symbol. actually starts at symbol+1
+          $cont = ($to < $total);
+        }
+        # scrape the symbols from this page
+        my $te = HTML::TableExtract->new( headers=>[qw /Symbol/ ] );
+        $te->parse($reply->content);
+        foreach my $ts ($te->tables) {
+          foreach my $tr ($ts->rows) {
+            if (@$tr[0]=~ m/(.*\.$exchange)$/ ) {
+              INFO (" Symbol: $1");
+              $symbols{$1}+=1 ;                           # add the symbol as a key in the hash removes duplicates automatically
             }
           }
         }
-      } while ($cont);
-      if ($s ne $sEnd) {
-        my $sleeptime = int(60+rand(60)) ;
+      }
+      if ($cont) {
+        my $sleeptime = int(5+rand(5)) ;
         INFO("Sleeping $sleeptime");
         sleep $sleeptime;                                      # needed otherwise we might overload yahoo server
       }
-    }
-    delete $symbols{Private} ;                                 # 'Private' is not a ticker symbol
+    } while ($cont);
+
     my @symbols = sort keys %symbols ;
     while ($#symbols>0) {                                      # still elements in the array
-      my $sleeptime = int(20+rand(20)) ;
+      my $sleeptime = int(10+rand(10)) ;
       INFO("Sleeping $sleeptime");
       sleep $sleeptime;                                        # needed otherwise we might overload yahoo server
       my $stocks = join (",",splice(@symbols,0,$popquantity)); # take $popquantity number of elements out
