@@ -42,7 +42,7 @@ module.
   --dsnuser     Username if needed for dsn
   --dsnpassword Password if needed for dsn
   --market      Market from which stocks should be treated. See Finance::Quote submodules
-  --exchange    Exchange as the suffix[exchange] set by Yahoo. PA[NYQ] for NYSE, PA[PAR] for PARIS etc
+  --exchanges   Exchanges as the exchange set by Yahoo. NYQ for NYSE, PAR for PARIS etc, comma separated list
   --stocks      Stock list (comma separated) use [] to specify your own ID
                 i.e. GOOG[GOOGLE]
   --startdate   startdate for usage with backpopulate and dumpquotes defaults to '1900-01-01'
@@ -80,7 +80,7 @@ my $dsn = 'dbi:SQLite:fqdb.db';
 my $dsnuser = '';
 my $dsnpasswd = '';
 my $market = '';
-my $exchange = '';
+my $exchanges = '';
 my $stocks = '';
 my $overwrite = 1 ; # overwrite existing data by default
 my $startdate = '1900-01-01' ;
@@ -94,7 +94,7 @@ GetOptions(
   'dsnuser=s'                => \$dsnuser,
   'dsnpassword|dsnpasswd=s'  => \$dsnpasswd,
   'market=s'                 => \$market,
-  'exchange=s'               => \$exchange,
+  'exchanges=s'              => \$exchanges,
   'stocks=s'                 => \$stocks,
   'startdate=s'              => \$startdate,
   'enddate=s'                => \$enddate,
@@ -128,7 +128,7 @@ if ($command) {
                                        last SWITCH;};
     ($command eq 'GTWriteConfig') && do { $fqdb->Finance::QuoteDB::Geniustrader::writeConfig($configFile);
                                           last SWITCH;};
-    ($command eq 'addYahooStocks') && do { $fqdb->add_yahoo_stocks($exchange);
+    ($command eq 'addYahooStocks') && do { $fqdb->add_yahoo_stocks($exchanges);
                                            last SWITCH;};
     INFO ("Nothing to do: No command given\n");
   };

@@ -358,75 +358,76 @@ sub dumpstocks {
 
 =head2 add_yahoo_stocks
 
-add_yahoo_stocks( $exchange )
+add_yahoo_stocks( $exchanges )
 
 retrieves yahoo tickers for specified exchanges and stores them in your database
-NOTE: $exchange being the extension as coming from yahoo + [ exchange ID ].
-      PA[NYQ] for Nyse
+NOTE: $exchanges being the ID as coming from yahoo.
+      NYQ for Nyse, PAR for Paris
 
 =cut
 
 sub add_yahoo_stocks {
   # http://uk.biz.yahoo.com/p/uk/cpi/index.html -> list of european stocks
-  my ($self,$exchange) = @_ ;
+  my ($self,$exchanges) = @_ ;
   my $popquantity = 30 ; # number of stocks to add in 1 call of addstock
 
-  if (!defined($exchange)) {
-    ERROR ("No exchange specified");
+  if (!defined($exchanges)) {
+    ERROR ("No exchanges specified");
   } else {
-    my ($exchsuffix,$exchID) ;
-    if ($exchange=~/(.+)\[(.+)\]/) {
-      ($exchsuffix,$exchID) = ($1,$2);
-    } else {
-      ERROR ("Invalid exchange specification");
-      return;
-    }
+    my %exchanges ;
+    foreach (split(',',$exchanges)) {
+      $exchanges{$_}=1 ;
+    }  ;
+
     my $ua = LWP::UserAgent->new;
     $ua->env_proxy;
-    INFO("Adding symbols from $exchID.") ;
-    my $yahoo_url = "http://finance.yahoo.com/lookup?s=**$exchsuffix&t=S" ; # t=S means ONLY stocks
-
-    no strict 'subs' ;
+    INFO("Adding symbols from $exchanges.") ;
 
     my %symbols ;
 
-    my $b = 0 ; # counter in url
-    my $cont ;
-    do {
-      $cont = 1; # continue increasing b
-      my $url = $yahoo_url."&b=".$b ;
-      DEBUG("URL: $url");
-      my $req = HTTP::Request->new(GET => $url);
-      my $reply = $ua->request($req);
-      if ($reply->is_success) {
-        if ($reply->content=~ m|Showing\s+(\d)+ - (\d+) of\s+(\d+)|) { # check if this is last page for this market
-          my ($from,$to,$total)=($1,$2,$3);
-          INFO (int($to*100/$total)." % completed");
-          $b=$to; # next page should start at this symbol. actually starts at symbol+1
-          $cont = ($to < $total);
-        }
-        # scrape the symbols from this page
-        my $te = HTML::TableExtract->new( headers=>[qw /Symbol Exchange/ ] );
-        $te->parse($reply->content);
-        foreach my $ts ($te->tables) {
-          foreach my $tr ($ts->rows) {
-            my $trsymb = @$tr[0] ;
-            $trsymb =~ s/ //g ;
-            my $exchsym = @$tr[1] ;
-            $exchsym =~ s/ //g ;
-            if ($exchsym eq $exchID) {
-              INFO (" Symbol: $trsymb");
-              $symbols{$trsymb}+=1 ;                           # add the symbol as a key in the hash removes duplicates automatically
+    no strict 'subs' ;
+
+    foreach my $letter (A..Z) {
+      my $yahoo_url = "http://finance.yahoo.com/lookup?s=**$letter&t=S" ; # t=S means ONLY stocks
+
+      my $b = 0 ; # counter in url
+      my $cont ;
+      do {
+        $cont = 1; # continue increasing b
+        my $url = $yahoo_url."&b=".$b ;
+        DEBUG("URL: $url");
+        my $req = HTTP::Request->new(GET => $url);
+        my $reply = $ua->request($req);
+        if ($reply->is_success) {
+          if ($reply->content=~ m|Showing\s+(\d)+ - (\d+) of\s+(\d+)|) { # check if this is last page for this market
+            my ($from,$to,$total)=($1,$2,$3);
+            INFO ("For A: ".int($to*100/$total)." % completed");
+            $b=$to; # next page should start at this symbol. actually starts at symbol+1
+            $cont = ($to < $total);
+          }
+          # scrape the symbols from this page
+          my $te = HTML::TableExtract->new( headers=>[qw /Symbol Exchange/ ] );
+          $te->parse($reply->content);
+          foreach my $ts ($te->tables) {
+            foreach my $tr ($ts->rows) {
+              my $trsymb = @$tr[0] ;
+              $trsymb =~ s/ //g ;
+              my $exchsym = @$tr[1] ;
+              $exchsym =~ s/ //g ;
+              if (defined($exchanges{$exchsym})) {
+                INFO (" Symbol: $trsymb - Exchange $exchsym");
+                $symbols{$trsymb}+=1 ;                           # add the symbol as a key in the hash removes duplicates automatically
+              }
             }
           }
         }
-      }
-      if ($cont) {
-        my $sleeptime = int(5+rand(5)) ;
-        INFO("Sleeping $sleeptime");
-        sleep $sleeptime;                                      # needed otherwise we might overload yahoo server
-      }
-    } while ($cont);
+        if ($cont) {
+          my $sleeptime = int(5+rand(5)) ;
+          INFO("Sleeping $sleeptime");
+          sleep $sleeptime;                                      # needed otherwise we might overload yahoo server
+        }
+      } while ($cont);
+    }
 
     my @symbols = sort keys %symbols ;
     while ($#symbols>0) {                                      # still elements in the array
