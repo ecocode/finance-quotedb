@@ -361,23 +361,30 @@ sub dumpstocks {
 add_yahoo_stocks( $exchange )
 
 retrieves yahoo tickers for specified exchanges and stores them in your database
-NOTE: $exchange being the extension as coming from yahoo !
+NOTE: $exchange being the extension as coming from yahoo + [ exchange ID ].
+      PA[NYQ] for Nyse
 
 =cut
 
 sub add_yahoo_stocks {
   # http://uk.biz.yahoo.com/p/uk/cpi/index.html -> list of european stocks
-  # http://finance.yahoo.com/lookup?s=**.BR&t=S&b=0
   my ($self,$exchange) = @_ ;
   my $popquantity = 30 ; # number of stocks to add in 1 call of addstock
 
   if (!defined($exchange)) {
     ERROR ("No exchange specified");
   } else {
+    my ($exchsuffix,$exchID) ;
+    if ($exchange=~/(.+)\[(.+)\]/) {
+      ($exchsuffix,$exchID) = ($1,$2);
+    } else {
+      ERROR ("Invalid exchange specification");
+      return;
+    }
     my $ua = LWP::UserAgent->new;
     $ua->env_proxy;
-    INFO("Adding symbols from $exchange.") ;
-    my $yahoo_url = "http://finance.yahoo.com/lookup?s=**.$exchange&t=S" ; # t=S means ONLY stocks
+    INFO("Adding symbols from $exchID.") ;
+    my $yahoo_url = "http://finance.yahoo.com/lookup?s=**$exchsuffix&t=S" ; # t=S means ONLY stocks
 
     no strict 'subs' ;
 
@@ -399,13 +406,17 @@ sub add_yahoo_stocks {
           $cont = ($to < $total);
         }
         # scrape the symbols from this page
-        my $te = HTML::TableExtract->new( headers=>[qw /Symbol/ ] );
+        my $te = HTML::TableExtract->new( headers=>[qw /Symbol Exchange/ ] );
         $te->parse($reply->content);
         foreach my $ts ($te->tables) {
           foreach my $tr ($ts->rows) {
-            if (@$tr[0]=~ m/(.*\.$exchange)$/ ) {
-              INFO (" Symbol: $1");
-              $symbols{$1}+=1 ;                           # add the symbol as a key in the hash removes duplicates automatically
+            my $trsymb = @$tr[0] ;
+            $trsymb =~ s/ //g ;
+            my $exchsym = @$tr[1] ;
+            $exchsym =~ s/ //g ;
+            if ($exchsym eq $exchID) {
+              INFO (" Symbol: $trsymb");
+              $symbols{$trsymb}+=1 ;                           # add the symbol as a key in the hash removes duplicates automatically
             }
           }
         }

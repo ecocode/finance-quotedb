@@ -42,7 +42,7 @@ module.
   --dsnuser     Username if needed for dsn
   --dsnpassword Password if needed for dsn
   --market      Market from which stocks should be treated. See Finance::Quote submodules
-  --exchanges   Exchanges as named by Yahoo. Comma separated list.
+  --exchange    Exchange as the suffix[exchange] set by Yahoo. PA[NYQ] for NYSE, PA[PAR] for PARIS etc
   --stocks      Stock list (comma separated) use [] to specify your own ID
                 i.e. GOOG[GOOGLE]
   --startdate   startdate for usage with backpopulate and dumpquotes defaults to '1900-01-01'
