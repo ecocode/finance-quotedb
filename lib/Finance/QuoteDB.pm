@@ -358,17 +358,18 @@ sub dumpstocks {
 
 =head2 add_yahoo_stocks
 
-add_yahoo_stocks( $exchanges )
+add_yahoo_stocks( $exchanges , [ $refsearchlist ] )
 
 retrieves yahoo tickers for specified exchanges and stores them in your database
 NOTE: $exchanges being the ID as coming from yahoo.
       NYQ for Nyse, PAR for Paris
+$refsearchlist is an optional reference to a list of search patterns. defaults to [**AA .. **ZZ]
 
 =cut
 
 sub add_yahoo_stocks {
   # http://uk.biz.yahoo.com/p/uk/cpi/index.html -> list of european stocks
-  my ($self,$exchanges) = @_ ;
+  my ($self,$exchanges,$refsearchlist) = @_ ;
   my $popquantity = 30 ; # number of stocks to add in 1 call of addstock
 
   if (!defined($exchanges)) {
@@ -379,16 +380,21 @@ sub add_yahoo_stocks {
       $exchanges{$_}=1 ;
     }  ;
 
+    no strict 'subs' ;
+    if (!defined(@$refsearchlist)) {
+      $refsearchlist = [AA .. ZZ] ;
+      $$refsearchlist[$_] = "**".$$refsearchlist[$_] foreach (0 .. $#{@$refsearchlist}) ; # add ** in front of each list item
+    }
+    DEBUG ("$_") foreach (@$refsearchlist);
+
     my $ua = LWP::UserAgent->new;
     $ua->env_proxy;
     INFO("Adding symbols from $exchanges.") ;
 
     my %symbols ;
 
-    no strict 'subs' ;
-
-    foreach my $letter (A..Z) {
-      my $yahoo_url = "http://finance.yahoo.com/lookup?s=**$letter&t=S" ; # t=S means ONLY stocks
+    foreach my $letter (@$refsearchlist) {
+      my $yahoo_url = "http://finance.yahoo.com/lookup?s=$letter&t=S" ; # t=S means ONLY stocks
 
       my $b = 0 ; # counter in url
       my $cont ;
@@ -422,7 +428,7 @@ sub add_yahoo_stocks {
           }
         }
         if ($cont) {
-          my $sleeptime = int(5+rand(5)) ;
+          my $sleeptime = int(15+rand(5)) ;
           INFO("Sleeping $sleeptime");
           sleep $sleeptime;                                      # needed otherwise we might overload yahoo server
         }
