@@ -180,7 +180,7 @@ sub backpopulate {
     my $q = Finance::QuoteHist->new( symbols => \@fqsymbols,
                                      start_date => $start_date,
                                      end_date => $end_date );
-    my $line ;
+    my $line = "" ;
     my %symbols ;
     foreach my $row ($q->quotes()) {
       my ($fqsymbol, $date, $open, $high, $low, $close, $volume) = @$row;
