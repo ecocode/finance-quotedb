@@ -6,6 +6,14 @@ use strict;
 use Exporter ();
 use vars qw/@EXPORT @EXPORT_OK @EXPORT_TAGS $VERSION/;
 use Finance::Quote;
+
+# Bug correction in Finance::QuoteHist
+# reported on RT #64365
+# This block can safely be removed once Finance::QuoteHist is corrected
+BEGIN {
+$Date::Manip::Backend = 'DM5';
+}
+
 use Finance::QuoteHist;
 use LWP::UserAgent;
 use HTML::TableExtract;
