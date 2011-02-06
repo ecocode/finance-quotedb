@@ -11,6 +11,7 @@ requires 'SQL::Translator';
 requires 'Pod::Usage';
 requires 'Config::IniFiles';
 requires 'Finance::Quote';
+requires 'Date::Manip';        # required by Finance::QuoteHist, but not mentioned in it
 requires 'Finance::QuoteHist';
 requires 'Regexp::Common.pm';
 requires 'Log::Log4perl';
