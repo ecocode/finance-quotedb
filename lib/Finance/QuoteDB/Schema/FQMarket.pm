@@ -24,7 +24,7 @@ __PACKAGE__->has_many('symbols'=>'Finance::QuoteDB::Schema::Symbol','fqmarket');
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Erik Colson, all rights reserved.
+Copyright 2008-2011 Erik Colson, all rights reserved.
 
 This file is part of Finance::QuoteDB.
 

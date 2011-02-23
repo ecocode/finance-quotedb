@@ -1,5 +1,12 @@
 Revision history for Finance-QuoteDB
 
+0.14       23.2.2011
+           BUGFIX: Date::Manip used in compatibility mode 5 in Finance::QuoteHist
+           BUGFIX: RT #55510 : workaround for backpopulate issue in Finance::QuoteHist
+           BUGFIX: Added missing dependencies in Finance::QuoteHist. Regexp::Common.pm and Date::Manip
+           FEATURE: --searchlist added to fqdb as frontend to add_yahoo_stocks
+           FEATURE: add_yahoo_stocks added to autoretrieve stocks from yahoo
+
 0.13       3.5.2009
            Some required default values set
            BUGFIX: Geniustrader config file corrected

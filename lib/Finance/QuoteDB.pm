@@ -6,6 +6,14 @@ use strict;
 use Exporter ();
 use vars qw/@EXPORT @EXPORT_OK @EXPORT_TAGS $VERSION/;
 use Finance::Quote;
+
+# Bug correction in Finance::QuoteHist
+# reported on RT #64365
+# This block can safely be removed once Finance::QuoteHist is corrected
+BEGIN {
+$Date::Manip::Backend = 'DM5';
+}
+
 use Finance::QuoteHist;
 use LWP::UserAgent;
 use HTML::TableExtract;
@@ -23,7 +31,7 @@ Finance::QuoteDB - User database tools based on Finance::Quote
 @EXPORT = ();
 @EXPORT_OK = qw /createdb updatedb addstock/ ;
 @EXPORT_TAGS = ( all => [@EXPORT_OK] );
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -172,7 +180,7 @@ sub backpopulate {
     my $q = Finance::QuoteHist->new( symbols => \@fqsymbols,
                                      start_date => $start_date,
                                      end_date => $end_date );
-    my $line ;
+    my $line = "" ;
     my %symbols ;
     foreach my $row ($q->quotes()) {
       my ($fqsymbol, $date, $open, $high, $low, $close, $volume) = @$row;
@@ -543,7 +551,7 @@ L<http://search.cpan.org/dist/Finance-QuoteDB>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Erik Colson, all rights reserved.
+Copyright 2008-2011 Erik Colson, all rights reserved.
 
 This file is part of Finance::QuoteDB.
 

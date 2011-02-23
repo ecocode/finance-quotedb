@@ -64,7 +64,7 @@ __PACKAGE__->belongs_to('symbolID'=>'Finance::QuoteDB::Schema::Symbol');
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Erik Colson, all rights reserved.
+Copyright 2008-2011 Erik Colson, all rights reserved.
 
 This file is part of Finance::QuoteDB.
 
