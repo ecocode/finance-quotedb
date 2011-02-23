@@ -31,7 +31,7 @@ Finance::QuoteDB - User database tools based on Finance::Quote
 @EXPORT = ();
 @EXPORT_OK = qw /createdb updatedb addstock/ ;
 @EXPORT_TAGS = ( all => [@EXPORT_OK] );
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -543,7 +543,7 @@ L<http://search.cpan.org/dist/Finance-QuoteDB>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Erik Colson, all rights reserved.
+Copyright 2008-2011 Erik Colson, all rights reserved.
 
 This file is part of Finance::QuoteDB.
 
