@@ -100,7 +100,7 @@ SWITCH: {
         };
         ( $command eq 'addYahooStocks' ) && do {
             my @searchlist = split( ',', $searchlist );
-            my $reflist = ( length(@searchlist) > 0 ) ? \@searchlist : undef;
+            my $reflist = ( scalar(@searchlist) > 0 ) ? \@searchlist : undef;
             $fqdb->add_yahoo_stocks( $exchanges, $reflist );
             last SWITCH;
         };
