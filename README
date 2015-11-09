@@ -9,8 +9,8 @@ DESCRIPTION
     stock database. The information is gathered by using Finance::Quote
     and the database is created and maintained by use of DBIx::Class.
 
-    Interfaces will be provided for Geniustrader and R. Thus easing the
-    data-part of any post-processing of stock data.
+    The config-file for GeniusTrader use is generated automatically.
+    Interface to R is planned to be integrated.
 
 
 INSTALLATION
