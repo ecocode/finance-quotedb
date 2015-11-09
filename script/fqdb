@@ -9,6 +9,113 @@ use Config::IniFiles;
 use Pod::Usage;
 use Log::Log4perl qw(:easy);
 
+# enable Log::Log4perl to only output $ERRORS
+Log::Log4perl->easy_init(
+    {  level => $INFO,
+
+       #                            file    => ">>fqdb.log"
+    }
+);
+my $logger = Log::Log4perl::get_logger();
+if ( $ENV{"FQDBDEBUG"} ) {    # enable debug logging if FQDBDEBUG is set
+    $logger->level($DEBUG);
+}
+
+my $dsn        = 'dbi:SQLite:fqdb.db';
+my $dsnuser    = '';
+my $dsnpasswd  = '';
+my $market     = '';
+my $exchanges  = '';
+my $searchlist = '';
+my $stocks     = '';
+my $overwrite  = 1;                      # overwrite existing data by default
+my $startdate  = '1900-01-01';
+my $enddate    = '';
+my $configFile = '';
+
+license();
+
+GetOptions(
+    'dsn=s'                   => \$dsn,
+    'dsnuser=s'               => \$dsnuser,
+    'dsnpassword|dsnpasswd=s' => \$dsnpasswd,
+    'market=s'                => \$market,
+    'exchanges=s'             => \$exchanges,
+    'searchlist=s'            => \$searchlist,
+    'stocks=s'                => \$stocks,
+    'startdate=s'             => \$startdate,
+    'enddate=s'               => \$enddate,
+    'overwrite!'              => \$overwrite,
+    'configFile=s'            => \$configFile,
+    'h|help'                  => sub { pod2usage(1); },
+    'c|w'       => sub { print("Please read the LICENSE file\n") },
+    'v|version' => sub {
+        print(   "Finance::QuoteDB version is "
+               . Finance::QuoteDB->VERSION
+               . "\n" );
+        print("Finance::Quote version is " . Finance::Quote->VERSION . "\n" );
+    }
+) or pod2usage(2);
+
+my $command = shift(@ARGV) || '';
+
+if ($command) {
+    my $fqdb = Finance::QuoteDB->new(
+              { dsn => $dsn, dsnuser => $dsnuser, dsnpasswd => $dsnpasswd } );
+
+SWITCH: {
+        ( $command eq 'createdb' ) && do {
+            $fqdb->createdb();
+            last SWITCH;
+        };
+        ( $command eq 'addstock' ) && do {
+            $fqdb->addstock( $market, $stocks );
+            last SWITCH;
+        };
+        ( $command eq 'delstock' ) && do {
+            $fqdb->delstock($stocks);
+            last SWITCH;
+        };
+        ( $command eq 'updatedb' ) && do {
+            $fqdb->updatedb();
+            last SWITCH;
+        };
+        ( $command eq 'backpopulate' ) && do {
+            $fqdb->backpopulate( $startdate, $enddate, $overwrite, $stocks );
+            last SWITCH;
+        };
+        ( $command eq 'dumpquotes' ) && do {
+            $fqdb->dumpquotes( $stocks, $startdate, $enddate );
+            last SWITCH;
+        };
+        ( $command eq 'dumpstocks' ) && do {
+            $fqdb->dumpstocks();
+            last SWITCH;
+        };
+        ( $command eq 'GTWriteConfig' ) && do {
+            $fqdb->Finance::QuoteDB::Geniustrader::writeConfig($configFile);
+            last SWITCH;
+        };
+        ( $command eq 'addYahooStocks' ) && do {
+            my @searchlist = split( ',', $searchlist );
+            my $reflist = ( length(@searchlist) > 0 ) ? \@searchlist : undef;
+            $fqdb->add_yahoo_stocks( $exchanges, $reflist );
+            last SWITCH;
+        };
+        INFO("Nothing to do: No command given\n");
+    }
+}
+
+sub license {
+    print("Finance::QuoteDB  Copyright (C) 2008  Erik Colson\n");
+    print(
+        "This program comes with ABSOLUTELY NO WARRANTY; for details type `fqdb -w'.\n"
+    );
+    print("This is free software, and you are welcome to redistribute it\n");
+    print("under certain conditions; type `fqdb -c' for details.\n");
+}
+
+
 =head1 NAME
 
 fqdb - Manage quote databases
@@ -65,91 +172,6 @@ type SQLite.
 =head2 fqdb updatedb --dsn='dbi:SQLite:quotes.db'
 
 Updates the database quotes.db with new quotes if available.
-
-=cut
-
-# enable Log::Log4perl to only output $ERRORS
-Log::Log4perl->easy_init( { level   => $INFO,
-#                            file    => ">>fqdb.log"
-                          });
-my $logger = Log::Log4perl::get_logger();
-if ($ENV{"FQDBDEBUG"}) { # enable debug logging if FQDBDEBUG is set
-	$logger->level($DEBUG)
-};
-
-my $dsn = 'dbi:SQLite:fqdb.db';
-my $dsnuser = '';
-my $dsnpasswd = '';
-my $market = '';
-my $exchanges = '';
-my $searchlist = '';
-my $stocks = '';
-my $overwrite = 1 ; # overwrite existing data by default
-my $startdate = '1900-01-01' ;
-my $enddate = '' ;
-my $configFile = '' ;
-
-license();
-
-GetOptions(
-  'dsn=s'                    => \$dsn,
-  'dsnuser=s'                => \$dsnuser,
-  'dsnpassword|dsnpasswd=s'  => \$dsnpasswd,
-  'market=s'                 => \$market,
-  'exchanges=s'              => \$exchanges,
-  'searchlist=s'             => \$searchlist,
-  'stocks=s'                 => \$stocks,
-  'startdate=s'              => \$startdate,
-  'enddate=s'                => \$enddate,
-  'overwrite!'               => \$overwrite,
-  'configFile=s'             => \$configFile,
-  'h|help'                   => sub { pod2usage(1); },
-  'c|w'                      => sub { print ("Please read the LICENSE file\n") },
-  'v|version'                => sub { print ("Finance::QuoteDB version is ".Finance::QuoteDB->VERSION."\n") ;
-                                      print ("Finance::Quote version is ".Finance::Quote->VERSION."\n") }
-) or pod2usage(2);
-
-my $command = shift(@ARGV)||'';
-
-if ($command) {
-  my $fqdb = Finance::QuoteDB->new({dsn=>$dsn,dsnuser=>$dsnuser,dsnpasswd=>$dsnpasswd}) ;
-
- SWITCH: {
-    ($command eq 'createdb') && do { $fqdb->createdb();
-                                     last SWITCH;};
-    ($command eq 'addstock') && do { $fqdb->addstock($market,$stocks);
-                                     last SWITCH;};
-    ($command eq 'delstock') && do { $fqdb->delstock($stocks);
-                                     last SWITCH;};
-    ($command eq 'updatedb') && do { $fqdb->updatedb();
-                                     last SWITCH;};
-    ($command eq 'backpopulate') && do { $fqdb->backpopulate($startdate,$enddate,$overwrite,$stocks);
-                                         last SWITCH;};
-    ($command eq 'dumpquotes') && do { $fqdb->dumpquotes($stocks,$startdate,$enddate);
-                                       last SWITCH;};
-    ($command eq 'dumpstocks') && do { $fqdb->dumpstocks();
-                                       last SWITCH;};
-    ($command eq 'GTWriteConfig') && do { $fqdb->Finance::QuoteDB::Geniustrader::writeConfig($configFile);
-                                          last SWITCH;};
-    ($command eq 'addYahooStocks') && do { my @searchlist = split(',',$searchlist);
-                                           my $reflist = (length(@searchlist)>0)?\@searchlist:undef ;
-                                           $fqdb->add_yahoo_stocks($exchanges,$reflist);
-                                           last SWITCH;};
-    INFO ("Nothing to do: No command given\n");
-  };
-}
-
-=head1 license
-
-=cut
-
-sub license {
-    print("Finance::QuoteDB  Copyright (C) 2008  Erik Colson\n") ;
-    print("This program comes with ABSOLUTELY NO WARRANTY; for details type `fqdb -w'.\n") ;
-    print("This is free software, and you are welcome to redistribute it\n") ;
-    print("under certain conditions; type `fqdb -c' for details.\n") ;
-};
-
 
 =head1 COPYRIGHT & LICENSE
 
