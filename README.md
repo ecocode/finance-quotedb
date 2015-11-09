@@ -5,7 +5,10 @@ Finance::QuoteDB - User database tools based on Finance::Quote
 # SYNOPSIS
 
 Please take a look at script/fqdb which is the command-line frontend
-to Finance::QuoteDB.
+to Finance::QuoteDB. Type following command at your command prompt for
+more information:
+
+    fqdb --help
 
 # METHODS
 
@@ -119,11 +122,16 @@ You can also look for information at:
 
     [http://search.cpan.org/dist/Finance-QuoteDB](http://search.cpan.org/dist/Finance-QuoteDB)
 
+- Mailing list
+
+    You can subscribe to the mailing list by sending an email to
+    fqdb-dev@lists.tuxfamily.org with subject : subscribe
+
 # ACKNOWLEDGEMENTS
 
 # COPYRIGHT & LICENSE
 
-Copyright 2008-2011 Erik Colson, all rights reserved.
+Copyright 2008-2015 Erik Colson, all rights reserved.
 
 This file is part of Finance::QuoteDB.
 

@@ -1,5 +1,11 @@
 Revision history for Finance-QuoteDB
 
+0.17       9.11.2015
+           Work on dzil release manager
+
+0.16       9.11.2015
+           BUGFIXES
+
 0.15       23.2.2011
            Evolution in percentage added in add_yahoo_quotes
            BUGFIX: Error in Makefile.PL corrected

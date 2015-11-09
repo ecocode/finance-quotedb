@@ -37,7 +37,10 @@ Finance::QuoteDB - User database tools based on Finance::Quote
 =head1 SYNOPSIS
 
 Please take a look at script/fqdb which is the command-line frontend
-to Finance::QuoteDB.
+to Finance::QuoteDB. Type following command at your command prompt for
+more information:
+
+    fqdb --help
 
 =head1 METHODS
 
@@ -544,6 +547,11 @@ L<http://cpanratings.perl.org/d/Finance-QuoteDB>
 
 L<http://search.cpan.org/dist/Finance-QuoteDB>
 
+=item * Mailing list
+
+You can subscribe to the mailing list by sending an email to
+fqdb-dev@lists.tuxfamily.org with subject : subscribe
+
 =back
 
 
@@ -552,7 +560,7 @@ L<http://search.cpan.org/dist/Finance-QuoteDB>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2011 Erik Colson, all rights reserved.
+Copyright 2008-2015 Erik Colson, all rights reserved.
 
 This file is part of Finance::QuoteDB.
 
