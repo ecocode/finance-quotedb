@@ -390,7 +390,7 @@ sub add_yahoo_stocks {
     }  ;
 
     no strict 'subs' ;
-    if (!defined(@$refsearchlist)) {
+    if (!@$refsearchlist) {
       $refsearchlist = [AA .. ZZ] ;
       $$refsearchlist[$_] = "**".$$refsearchlist[$_] foreach (0 .. $#{@$refsearchlist}) ; # add ** in front of each list item
     }
