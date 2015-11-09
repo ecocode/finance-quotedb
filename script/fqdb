@@ -9,6 +9,8 @@ use Config::IniFiles;
 use Pod::Usage;
 use Log::Log4perl qw(:easy);
 
+# VERSION
+
 # enable Log::Log4perl to only output $ERRORS
 Log::Log4perl->easy_init(
     {  level => $INFO,
