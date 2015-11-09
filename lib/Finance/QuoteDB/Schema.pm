@@ -6,6 +6,8 @@ use warnings;
 
 __PACKAGE__->load_classes(qw/ Symbol Quote FQMarket /);
 
+# VERSION
+
 =head1 METHODS
 
 =head2 connect_and_deploy

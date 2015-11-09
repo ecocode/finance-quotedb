@@ -18,6 +18,8 @@ Finance::QuoteDB::Geniustrader - Interfaces to external program Geniustrader
 @EXPORT_OK = qw // ;
 @EXPORT_TAGS = ( all => [@EXPORT_OK] );
 
+# VERSION
+
 =head1 SYNOPSIS
 
 Please take a look at script/fqdb which is the command-line frontend

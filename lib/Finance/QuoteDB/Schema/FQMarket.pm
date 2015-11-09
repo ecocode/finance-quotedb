@@ -1,6 +1,8 @@
 package Finance::QuoteDB::Schema::FQMarket;
 use base qw/DBIx::Class/;
 
+# VERSION
+
 use strict;
 use warnings;
 
