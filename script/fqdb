@@ -109,7 +109,7 @@ SWITCH: {
 }
 
 sub license {
-    print("Finance::QuoteDB  Copyright (C) 2008  Erik Colson\n");
+    print("Finance::QuoteDB  Copyright (C) 2008-2015  Erik Colson\n");
     print(
         "This program comes with ABSOLUTELY NO WARRANTY; for details type `fqdb -w'.\n"
     );
