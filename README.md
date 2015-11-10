@@ -125,7 +125,7 @@ You can also look for information at:
 - Mailing list
 
     You can subscribe to the mailing list by sending an email to
-    fqdb-dev@lists.tuxfamily.org with subject : subscribe
+    fqdb@lists.tuxfamily.org with subject : subscribe
 
 # ACKNOWLEDGEMENTS
 
