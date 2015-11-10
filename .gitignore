@@ -15,3 +15,6 @@ inc
 *.bak
 MANIFEST
 .build
+GPATH
+GRTAGS
+GTAGS
