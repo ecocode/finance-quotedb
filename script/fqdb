@@ -114,7 +114,8 @@ sub license {
         "This program comes with ABSOLUTELY NO WARRANTY; for details type `fqdb -w'.\n"
     );
     print("This is free software, and you are welcome to redistribute it\n");
-    print("under certain conditions; type `fqdb -c' for details.\n");
+    print("under certain conditions; type `fqdb -c' for details.\n\n");
+    print("You can read the doc with `fqdb -h'.\n");
 }
 
 
